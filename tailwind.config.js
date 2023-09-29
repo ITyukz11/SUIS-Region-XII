@@ -10,7 +10,8 @@ module.exports = {
         "navy-primary":"#053B50",
         "blue-primary":"#176B87",
         "teal-primary":"#64CCC5",
-        "grey-primary":"#EEEEEE"
+        "grey-primary":"#EEEEEE",
+        "login-primary":"#01091C"
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
