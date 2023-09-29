@@ -1,3 +1,4 @@
+'use client'
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
@@ -8,7 +9,7 @@ import { loadSlim } from "tsparticles-slim"; // if you are going to use `loadSli
 
 export default function Login() {
   const [currentImage, setCurrentImage] = useState('/images/SUIS-Logo.png');
-  const alternateImage = '/images/RPS.png';
+  const alternateImage = '/images/RPS-Logo.png';
   const [isImageFading, setIsImageFading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +20,7 @@ export default function Login() {
       setTimeout(() => {
         setCurrentImage(currentImage === '/images/SUIS-Logo.png' ? alternateImage : '/images/SUIS-Logo.png');
         setIsImageFading(false); // Trigger the fade-in effect
-      }, 500); // Adjust the timing to match your transition duration
+      },300); // Adjust the timing to match your transition duration
     }, 5000);
 
     return () => clearInterval(intervalId);
@@ -36,19 +37,18 @@ const particlesLoaded = useCallback(async container => {
     console.log(container);
 }, []);
   return (
-    <div className="flex flex-wrap justify-around items-center bg-gradient-to-b from-black via-navy-primary to-black h-screen w-screen -ml-8">
+    <div className="flex flex-wrap justify-around items-center bg-gradient-to-b from-black via-login-primary to-black h-screen w-screen -ml-8">
       <div className='flex flex-col items-center z-10'>
 
       <div className="w-96 h-fit bg-black bg-opacity-70 shadow-2xl p-6 rounded-2xl text-white z-10">
         
         <div className='flex justify-center '> 
         <Image
-        className={`transition-opacity ${isImageFading ? 'opacity-0 delay-300' : 'opacity-100 delay-300'}`}
+        className={`transition-opacity ${isImageFading ? 'opacity-0 ' : 'opacity-100'}`}
         src={currentImage}
         width={200}
         height={200}
-        alt="DAR Logo"
-      />
+        alt="SUIS Logo & RPS Logo"/>
         </div>
         
         <form>
@@ -80,15 +80,16 @@ const particlesLoaded = useCallback(async container => {
             <input type='checkbox' onClick={()=> setShowPassword(!showPassword)}></input>
             <label>Show Password</label>
           </div>
-          <div className="text-center mt-4">
+          <div className="flex flex-col gap-5 text-center mt-4">
             <Link href="/dashboard">       
             <button
-              className="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105"
+              className="w-full bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 shadow-md shadow-gray-600"
               type="button"
             >
               Login
             </button>
             </Link>
+            <span className='-mb-5'>v0.0.2</span>
           </div>
         </form>
       </div>
@@ -155,32 +156,32 @@ const particlesLoaded = useCallback(async container => {
                     number: {
                         density: {
                             enable: true,
-                            area: 1200,
+                            area: 1500,
                         },
-                        value: 50,
+                        value: 100,
                     },
                     opacity: {
                         value: 0.5,
                     },
-                    shape: {
-                        type: "image",
-                        image: [
-                          {
-                          src: "/images/worker.png", 
+                    // shape: {
+                    //     type: "image",
+                    //     image: [
+                    //       {
+                    //       src: "/images/worker.png", 
               
-                        }, {
-                          src: "/images/programming.png", // Use the imported image variable
+                    //     }, {
+                    //       src: "/images/programming.png", 
                      
-                        },{
-                          src: "/images/server.png", // Use the imported image variable
+                    //     },{
+                    //       src: "/images/server.png", 
                    
-                        },{
-                          src: "/images/people.png", 
+                    //     },{
+                    //       src: "/images/people.png", 
               
-                        },]
-                    },
+                    //     },]
+                    // },
                     size: {
-                        value: 15,
+                        value: 2,
                     },
                 },
                 detectRetina: true,
