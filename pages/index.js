@@ -8,7 +8,6 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>SUIS</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
        <Login/>
