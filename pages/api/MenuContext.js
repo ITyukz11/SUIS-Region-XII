@@ -16,6 +16,12 @@ export function MenuProvider({ children }) {
     const [ccisActiveSubMenu, setCcisActiveSubMenu] = useState(false);
     const [essisActiveSubMenu, setEssisActiveSubMenu] = useState(false);
 
+    //SubMenus Active
+    const [essThreeA, setEssThreeA] = useState(false);
+    const [essThreeB, setEssThreeB] = useState(false);
+
+    //Track the state of the Disclosure
+    const [disclosureOpen, setDisclosureOpen] = useState(false);
 
     
 
@@ -57,6 +63,10 @@ export function MenuProvider({ children }) {
                 setPrActive(false);
                 setCcisActive(false);
                 setEssisactive(false);
+
+                //SubMenu Actives
+                setEssThreeA(false);
+                setEssThreeB(false);
                 console.log(menu)
                 break;
             case 2:
@@ -64,6 +74,10 @@ export function MenuProvider({ children }) {
                 setPrActive(true);
                 setCcisActive(false);
                 setEssisactive(false);
+
+                //SubMenu Actives
+                setEssThreeA(false);
+                setEssThreeB(false);
                 console.log(menu)
                 break;
             case 3:
@@ -71,6 +85,10 @@ export function MenuProvider({ children }) {
                 setPrActive(false);
                 setCcisActive(true);
                 setEssisactive(false);
+
+                //SubMenu Actives
+                setEssThreeA(false);
+                setEssThreeB(false);
                 console.log(menu)
                 break;
             case 4:
@@ -84,6 +102,22 @@ export function MenuProvider({ children }) {
                 break;
         }
     };
+    const subMenuActive =(submenu) => {
+        switch (submenu) {
+            case 11:
+                setEssThreeA(true);
+                setEssThreeB(false);
+                console.log(submenu)
+                break;
+            case 12:
+                setEssThreeA(false);
+                setEssThreeB(true);
+                console.log(submenu)
+                break;
+            default:
+                break;
+        }
+    }
     const prSubmenu = () =>{
         setPrActiveSubMenu(!prActiveSubMenu);
     }
@@ -95,6 +129,10 @@ export function MenuProvider({ children }) {
         setEssisActiveSubMenu(!essisActiveSubMenu);
         console.log(essisActiveSubMenu)
     }
+    const toggleDisclosure = () => {
+        setDisclosureOpen(!disclosureOpen);
+        console.log(disclosureOpen)
+    };
 
     return (
         <MenuContext.Provider
@@ -103,14 +141,21 @@ export function MenuProvider({ children }) {
                 prActive,
                 ccisActive,
                 essisActive,
+
                 prActiveSubMenu,
                 ccisActiveSubMenu,
                 essisActiveSubMenu,
+
+                essThreeA,
+                essThreeB,
+
+                disclosureOpen,
                 prSubmenu,
                 ccisSubmenu,
                 essisSubmenu,
-
                 menuActive,
+                toggleDisclosure,
+                subMenuActive,
 
             }}
         >
