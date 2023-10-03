@@ -1,50 +1,50 @@
-import { query } from "../../../../lib/db";
+// pages/api/test-db-connection.js
+
+import { testDatabaseConnection } from "../../../../lib/db";
+import { query } from "../../../../lib/db"; // Import your query function
 
 export default async function handler(req, res) {
-    if (req.method === "GET") {
+  await testDatabaseConnection();
+
+  if (req.method === "GET") {
+    try {
         try {
-          const essSultanKudarat = await query({
-            query: "SELECT * FROM `ess_3a_sultan_kudarat` ORDER BY `Collective CLOA Sequence Number` DESC",
+          const essNorthCot = await query({
+            query: 'SELECT * FROM suis.ess_3a_sultan_kudarat',
             values: [],
           });
-          res.status(200).json(essSultanKudarat);
+
+          // Use JSON.stringify with null and a number (e.g., 2) for indentation
+          const prettyJSON = JSON.stringify(essNorthCot, null, 2);
+
+          res.status(200).send(prettyJSON); // Send the pretty-printed JSON as a response
         } catch (error) {
           console.error("Error fetching data:", error);
           res.status(500).json({ error: "Internal Server Error: " + error.message });
         }
-      }
-      
 
-    if (req.method === "POST") {
-     
-        const {sql:sql, values:values} = req.body;
-        console.log("POST SQL QUERY: ",sql)
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal Server Error: " + error.message });
+    }
+  }
 
+  if (req.method === "POST") {
+    const { sql, values } = req.body;
     try {
-      const insertData = await query({
+      await query({
         query: sql,
-        values: values
+        values: values,
       });
   
-      if (insertData.affectedRows > 0) {
-        res.status(201).json({ message: "Success" });
-      } else {
-        res.status(500).json({ error: "Failed to insert data" });
-      }
+      // If no error is thrown, consider the operation successful
+      res.status(201).json({ message: "Success" });
     } catch (error) {
       console.error("Error inserting data:", error);
+      console.error("Values:", values);
       res.status(500).json({ error: "Internal Server Error: " + error.message });
     }
   }
   
-
-}
   
-
-export const config = {
-    api: {
-      bodyParser: {
-        sizeLimit: '10mb',
-      },
-    },
-  }
+}

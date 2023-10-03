@@ -1,70 +1,50 @@
-import { query } from "../../../../lib/db";
+// pages/api/test-db-connection.js
+
+import { testDatabaseConnection } from "../../../../lib/db";
+import { query } from "../../../../lib/db"; // Import your query function
 
 export default async function handler(req, res) {
-    if (req.method === "GET") {
+  await testDatabaseConnection();
+
+  if (req.method === "GET") {
+    try {
         try {
-          const essSouthCot = await query({
-            query: "SELECT * FROM `ess_3a_south_cotabato` ORDER BY `Collective CLOA Sequence Number` DESC",
+          const essNorthCot = await query({
+            query: 'SELECT * FROM suis.ess_3a_south_cotabato',
             values: [],
           });
-          res.status(200).json(essSouthCot);
+
+          // Use JSON.stringify with null and a number (e.g., 2) for indentation
+          const prettyJSON = JSON.stringify(essNorthCot, null, 2);
+
+          res.status(200).send(prettyJSON); // Send the pretty-printed JSON as a response
         } catch (error) {
           console.error("Error fetching data:", error);
           res.status(500).json({ error: "Internal Server Error: " + error.message });
         }
-      }
-      
 
-    if (req.method === "POST") {
-        // const {
-        //     "start": startDate,
-        //     "end": endDate,
-        //     "today": todayDate,
-        //     "username": username,
-        //     "phonenumber": phoneNumber,
-        //     "audit": auditInfo,
-        //     "audit_URL": auditUrl,
-        //     "Collective CLOA Sequence Number": cloaNumber,
-        //     "OCT/TCT Number": octTctNumber,
-        //     "Collective CLOA Number": colCloaNumber,
-        //     "First Name": firstName,
-        //     "Middle Name": middleName,
-        //     "Last Name": lastName,
-        //     "Actual area of tillage/cultivation (in square meters)": area,
-        //     "Gender": gender,
-        //     "Educational Attainment": education,
-        //     "Civil Status": civilStatus
-        // } = req.body;
-        const {sql:sql, values:values} = req.body;
-        console.log("POST SQL QUERY: ",sql)
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal Server Error: " + error.message });
+    }
+  }
 
+  if (req.method === "POST") {
+    const { sql, values } = req.body;
     try {
-      const insertData = await query({
+      await query({
         query: sql,
-        values: values
-       // query: "INSERT INTO suis.`sample ess 3a sc` (`start`, `end`, `today`, `username`, `phonenumber`, `audit`, `audit_URL`, `Collective CLOA Sequence Number`, `OCT/TCT Number`,`Collective CLOA Number`,`First Name`, `Middle Name`, `Last Name`,`Actual area of tillage/cultivation (in square meters)`,  `Gender`,  `Educational Attainment`, `Civil Status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        //values: [startDate, endDate, todayDate, username, phoneNumber, auditInfo, auditUrl,cloaNumber,octTctNumber,colCloaNumber, firstName, middleName, lastName, area,  gender,   education, civilStatus]
+        values: values,
       });
   
-      if (insertData.affectedRows > 0) {
-        res.status(201).json({ message: "Success" });
-      } else {
-        res.status(500).json({ error: "Failed to insert data" });
-      }
+      // If no error is thrown, consider the operation successful
+      res.status(201).json({ message: "Success" });
     } catch (error) {
       console.error("Error inserting data:", error);
+      console.error("Values:", values);
       res.status(500).json({ error: "Internal Server Error: " + error.message });
     }
   }
   
-
-}
   
-
-export const config = {
-    api: {
-      bodyParser: {
-        sizeLimit: '10mb',
-      },
-    },
-  }
+}
