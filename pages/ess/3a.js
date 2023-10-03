@@ -24,6 +24,7 @@ export default function ThreeA() {
 
   const [isMobile, setIsMobile] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadingStatus,setUploadingStatus] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
 
   //Modal for counting blanks
@@ -36,6 +37,13 @@ export default function ThreeA() {
   //Define the pronvinces 
   const provinces = ['north-cotabato', 'sarangani', 'south-cotabato', 'sultan-kudarat'];
 
+  //Getting the error message from api
+  const [errorPostReq, setErrorPostReq] = useState('')
+  const [errorActive, setErrorActive] = useState(false)
+
+  //Check if batches are complete uploading
+  const [batchUploadStatus, setBatchUploadStatus] = useState(false)
+  const [uploadingSuccess, setUploadingSuccess] = useState(false)
   const [seqNoNorthCot, setSeqNoNorthCot] = useState()
   const [areaNorthCot, setAreaNoNorthCot] = useState()
   const [maleNorthCot, setMaleNorthCot] = useState()
@@ -120,7 +128,6 @@ export default function ThreeA() {
     });
   }
   
-  //strt, end, tDay,uName, pNum, aud, audUrl, cloa, otNum, cloaNo, area, fName,mName,lName,Gen, eduAtt, civStat
   async function uploadNewDatas(sql, values) {
     const postData = {
       method: "POST",
@@ -129,24 +136,7 @@ export default function ThreeA() {
       },
       body: JSON.stringify({
         sql: sql,
-        values: values
-        // "start": strt,
-        // "end": end,
-        // "today": tDay,
-        // "username": uName,
-        // "phonenumber": pNum,
-        // "audit": aud,
-        // "audit_URL": audUrl,
-        // "Collective CLOA Sequence Number": cloa,
-        // "OCT/TCT Number": otNum,
-        // "Collective CLOA Number":cloaNo,
-        // "Actual area of tillage/cultivation (in square meters)": area,
-        // "First Name": fName,
-        // "Middle Name": mName,
-        // "Last Name": lName,
-        // "Gender": Gen,
-        // "Educational Attainment": eduAtt,
-        // "Civil Status": civStat
+        values: values     
       })
     };
 
@@ -157,14 +147,23 @@ export default function ThreeA() {
         // Handle server error here (e.g., res.status >= 400)
         const errorResponse = await res.json();
         const errorMessage = errorResponse.error || "Server error occurred";
-        console.log(errorMessage)
+        console.log("Error MessageZXC: ", errorMessage);
+        setErrorPostReq(await errorMessage); // Set the error message in state
+
+          setErrorActive(true)
+        
         return;
+        
       }
 
       const response = await res.json();
       console.log("response: ", response)
       if (response.message === "Success") {
         console.log("Success: ", response)
+     
+        setUploadingSuccess(true)
+    
+        console.log("help uploadingSuccess:", uploadingSuccess)
       } else {
         console.log("Failed", response)
       }
@@ -174,13 +173,53 @@ export default function ThreeA() {
   }
 
 
-
   //FETCH DATAS
   useEffect(() => {
     getEss3ADatas()
   }, []);
 
+  //Handling Upload Success
+  useEffect(() => {
+    console.log("help errorActive:", errorActive)
+    console.log("help uploadingSuccess:", uploadingSuccess)
 
+if(batchUploadStatus){
+  if(!errorActive && uploadingSuccess){
+
+    Swal.fire({
+      title: 'Uploaded Successfully!',
+      text: `${selectedFile? selectedFile.name:''}`,
+      icon: 'success',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#053B50'                         
+  }).then((result)=>{
+    if(result.isConfirmed){
+      setUploadingStatus(!uploadingStatus)
+      setBatchUploadStatus(false)
+    }
+  });
+  } else{
+    
+      Swal.fire({
+        title: 'Upload Failed!',
+        html: `${selectedFile? selectedFile.name:''} <br> Error Message: <div style="max-height: 200px; overflow-y: auto;">${errorPostReq}</div>`,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#053B50',
+      }).then((result)=>{
+        if(result.isConfirmed ){
+          setErrorActive(false) 
+          setBatchUploadStatus(false)
+        }
+      }); 
+    
+  }
+} 
+  }, [batchUploadStatus])
+  
+
+
+ 
   //Counting Sequence Number Function
   const countSequenceNo = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
@@ -226,7 +265,7 @@ export default function ThreeA() {
       // Check if the item has a SeqNo property
       
        //Change to lowercase to match other cases
-      const gender = item.Gender.toLowerCase()
+      const gender = item.Gender != null? item.Gender.toLowerCase() : ''
       if (gender == "male") {
         // Increment the count by 1 for each occurrence of SeqNo
         return count + 1;
@@ -245,7 +284,7 @@ const countTotalFemales = (datas) =>{
     // Check if the item has a SeqNo property
 
       //Change to lowercase to match other cases
-      const gender = item.Gender.toLowerCase()
+      const gender = item.Gender != null? item.Gender.toLowerCase() : ''
       if (gender == "female") {
       // Increment the count by 1 for each occurrence of SeqNo
       return count + 1;
@@ -272,157 +311,158 @@ const countTotalARBs =(datas)=>{
 
 
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-  };
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  setSelectedFile(file);
+  setUploadingStatus(true);
+};
+
+
+
+//  const handleUpload2 = () => {
+//   const sql = 'INSERT INTO ess_3a_north_cotabato(start, "end", today, username, phonenumber, audit, "audit_URL", "Collective CLOA Sequence Number", "OCT/TCT Number", "Collective CLOA Number", "First Name", "Middle Name", "Last Name", "Actual area of tillage/cultivation (in square meters)", "Gender", "Educational Attainment", "Civil Status") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17), ($18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34)';
+  
+//   const values = [
+//     'mary', '2', '3', '4', '5', '6', 'yury', '8', '9', '2', '3', '1', '2', '3', '4', '2', '1',
+//     'yuki', '2', '3', '4', '5', '6', 'yuna', '8', '9', '2', '3', '1', '2', '3', '4', '2', '1'
+//   ];
+
+//   uploadNewDatas(sql, values);
+// }
+
+
 
   const handleUpload = () => {
     if (!selectedFile) {
-      return;
-    }
-    let timerInterval
-    Swal.fire({
-      title: 'Uploading...',
-      html: `${selectedFile.name} please wait!`,
-      timer: 2000,
-      timerProgressBar: true,
-      didOpen: () => {
-        Swal.showLoading()
+      return 
+    } else {
+      if (!selectedFile.name.includes("3A")) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Please upload ESS 3A File only!',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#053B50'
+        })
+      } else {
+        Swal.fire({
+          title: 'Uploading...',
+          html: `${selectedFile.name} please wait!`,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
             // Read the selected CSV file using FileReader
-    const reader = new FileReader();
+            const reader = new FileReader();
 
-    reader.onload = async (event) => {
-      const fileContent = event.target.result;
+            reader.onload = async (event) => {
+              const fileContent = event.target.result;
 
-      // Parse the CSV content
-      const datas = [];
+              // Parse the CSV content
+              const datas = [];
 
-      csv({ separator: ',' }) // You can specify the separator here if it's not a comma
-        .on('data', (row) => {
-          const rowDataArray = Object.values(row);
+              csv({ separator: ',' }) // You can specify the separator here if it's not a comma
+                .on('data', (row) => {
+                  const rowDataArray = Object.values(row);
+                  const selectedData = {
+                    'start': rowDataArray[0],
+                    'end': rowDataArray[1],
+                    'today': rowDataArray[2],
+                    'username': rowDataArray[3],
+                    'phonenumber': rowDataArray[5],
+                    'audit': rowDataArray[6],
+                    'audit_URL': rowDataArray[7],
+                    'Collective CLOA Sequence Number': rowDataArray[9],
+                    'OCT/TCT Number': rowDataArray[10],
+                    'Collective CLOA Number': rowDataArray[11],
+                    'First Name': rowDataArray[13],
+                    'Middle Name': rowDataArray[14],
+                    'Last Name': rowDataArray[15],
+                    'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
+                    'Gender': rowDataArray[23], // Use the found index, or an empty string if not found
+                    'Educational Attainment': rowDataArray[46],
+                    'Civil Status': rowDataArray[47],
+                  };
+                  datas.push(selectedData);
+                })
+                .on('end', () => {
 
-          console.log("rowDataArray: ", rowDataArray)
+                  // Execute the SQL query with your database connection
+                  // You can use your MySQL connection to execute the query here
+                })
+                .write(fileContent);
+              const batchSize = 100; // Choose an appropriate batch size
 
-          const selectedData = {
-            'start': rowDataArray[0],
-            'end': rowDataArray[1],
-            'today': rowDataArray[2],
-            'username': rowDataArray[3],
-            'phonenumber': rowDataArray[5],
-            'audit': rowDataArray[6],
-            'audit_URL': rowDataArray[7],
-            'Collective CLOA Sequence Number': rowDataArray[9],
-            'OCT/TCT Number': rowDataArray[10],
-            'Collective CLOA Number': rowDataArray[11],
-            'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
-            'First Name': rowDataArray[13],
-            'Middle Name': rowDataArray[14],
-            'Last Name': rowDataArray[15],
-            'Gender': rowDataArray[23], // Use the found index, or an empty string if not found
-            'Educational Attainment': rowDataArray[46],
-            'Civil Status': rowDataArray[47],
-          };
-          datas.push(selectedData);
-        })
-        .on('end', () => {
+              // Split the datas array into batches
+              const batches = [];
+              for (let i = 0; i < datas.length; i += batchSize) {
+                batches.push(datas.slice(i, i + batchSize));
+              }
 
-          // Execute the SQL query with your database connection
-          // You can use your MySQL connection to execute the query here
-        })
-        .write(fileContent);
-      const batchSize = 100; // Choose an appropriate batch size
+              // Initialize a counter variable
+              let completedBatches = 0;
+              let parameterIndex = 1; // Initialize the parameter index
 
-      // Split the datas array into batches
-      const batches = [];
-      for (let i = 0; i < datas.length; i += batchSize) {
-        batches.push(datas.slice(i, i + batchSize));
-      }
+              // Loop through batches and insert data
+              for (const batch of batches) {
+                const columns = Object.keys(batch[0]); // Assuming all objects have the same keys
+                const columnsWithDoubleQuote = columns.map((column) => `"${column}"`);
+                const placeholders = batch
+                  .map(() =>
+                    `(${columns.map(() => `$${parameterIndex++}`).join(', ')})`
+                  )
+                  .join(', ');
 
-      // Initialize a counter variable
-let completedBatches = 0;
+                // Reset the parameterIndex to 1 when it reaches 100
+                if (parameterIndex > 100) {
+                  parameterIndex = 1;
+                }
 
-// Loop through batches and insert data
-for (const batch of batches) {
-  const columns = Object.keys(batch[0]); // Assuming all objects have the same keys
-  const columnsWithBackticks = columns.map((column) => `\`${column}\``);
-  const placeholders = batch.map(() => `(${columns.map(() => '?').join(', ')})`).join(', ');
-  const values = batch.flatMap((obj) => columns.map((col) => obj[col]));
+                const values = batch.flatMap((obj) => columns.map((col) => obj[col]));
 
-  const sql = `INSERT INTO suis.\`ess_3a_${activeTab.replace(/-/g, "_")}\` (${columnsWithBackticks.join(', ')}) VALUES ${placeholders}`;
-  console.log('SQL:', sql);
-  console.log('Batch Size:', batch.length);
-  // Execute the SQL query with your database connection here
-  uploadNewDatas(sql, values)
-    .then(() => {
-      // Increment the counter when the batch is completed
-      completedBatches++;
 
-      // Check if all batches are completed
-      if (completedBatches === batches.length) {
-        timerInterval=0;
-        console.log('All batches completed');
-        // Perform any actions you need after all batches are done
-      }
-    })
-    .catch((error) => {
-      // Handle errors if needed
-      console.error('Error:', error);
-    });
+                const sql = `INSERT INTO suis.ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
+                console.log('SQL:', sql);
+                console.log('Batch Size:', batch.length);
+
+                // Execute the SQL query with your database connection here
+                await uploadNewDatas(sql, values)
+                  .then(async () => {
+                    // Increment the counter when the batch is completed
+                    completedBatches++;
+
+                    // Check if all batches are completed
+                    if (completedBatches === batches.length) {
+                      // Perform any actions you need after all batches are done
+                      setBatchUploadStatus(true);
+                        console.log('All batches completed');
+                      
+                        console.log("help batchUploadStatus: ",batchUploadStatus)
+                      Swal.close(); // Close the Swal dialog
+                      getEss3ADatas()
+
+                                                    
 }
-
-
-
-      // const columns = Object.keys(datas[0]); // Assuming all objects have the same keys
-      // const columnsWithBackticks = columns.map((column) => `\`${column}\``);
-      // const placeholders = datas.map(() => `(${columns.map(() => '?').join(', ')})`).join(', ');
-      // const values = datas.flatMap(obj => columns.map(col => obj[col]));
-      // const sql = 'INSERT INTO suis.`sample ess 3a sc`' + ` (${columnsWithBackticks.join(', ')}) VALUES ${placeholders}`;
-      // console.log('Data:', datas);
-      // console.log('columns: ',columns)
-      // console.log('placeholders: ', placeholders)
-      // console.log('values:', values)
-      // console.log('SQL: ',sql)
-      // uploadNewSouthCotData(datas)
-      //  uploadNewSouthCotData(
-      //   row["start"], 
-      //   row["end"], 
-      //   row["today"],
-      //   row["username"],
-      //   row["phonenumber"], 
-      //   row["audit"], 
-      //   row["audit_URL"], 
-      //   row["Collective CLOA Sequence Number"], 
-      //   row["OCT/TCT Number"], 
-      //   row["Collective CLOA Number"], 
-      //   row["Actual area of tillage/cultivation (in square meters)"], 
-      //   row["First Name"],
-      //   row["Middle Name"],
-      //   row["Last Name"],
-      //   row["Gender"], 
-      //   row["Educational Attainment"], 
-      //   row["Civil Status"])
-
-
-    };
-
-    reader.readAsText(selectedFile); // Read the file as text
-      },
-      willClose: () => {
-        clearInterval(timerInterval)
+                  })
+                  .catch((error) => {
+                    // Handle errors if needed
+                    console.error('Error:', error);
+                    Swal.fire({
+                      title: 'Error!',
+                      text: `Error occured while uploading...  ${error}`,
+                      icon: 'error',
+                      confirmButtonText: 'OK',
+                      confirmButtonColor: '#053B50'
+                    });
+                  });
+              }
+            };
+            reader.readAsText(selectedFile); // Read the file as text
+          },
+        })
       }
-    }).then((result) => {
-
-      getEss3ADatas()
-      
-      setSelectedFile(null)
-    })
-
-
-
+    }
   };
 
-console.log("countSequenceNo(southCotData): ",countSequenceNo(southCotData))
   const gridClassName = isMobile ? 'flex flex-wrap gap-5 text-xs' : 'grid grid-rows-2 grid-flow-col gap-5 mt-10 ml-5 mr-5 justify-items-center';
 
   const openFileInput = () => {
@@ -581,7 +621,7 @@ console.log("countSequenceNo(southCotData): ",countSequenceNo(southCotData))
           </div>
 
           <div className='grid grid-cols-6 gap-0 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
-            <Image width={100} height={100} src="/images/sultan-Kudarat.png" alt='DAR Sultan Kudarat Logo' />
+            <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' />
             <div className='w-fit flex flex-col text-left justify-start items-center'>
               <MdFormatListNumbered className='text-5xl' />
               <label className='font-bold text-navy-primary'>Seq No.</label>
@@ -641,7 +681,7 @@ console.log("countSequenceNo(southCotData): ",countSequenceNo(southCotData))
       
             </div>
             <div className={`flex items-center gap-5 ${isMobile ? 'flex-wrap' : ''}`}>
-              {selectedFile && (
+              {selectedFile && uploadingStatus && (
                 <>
                   <button className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full' onClick={handleUpload}>Upload</button>
                   <p className="ml-2 mt-3 text-sm text-green-700">
