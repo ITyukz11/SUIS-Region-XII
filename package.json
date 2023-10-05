@@ -8,6 +8,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@headlessui/tailwindcss": "^0.2.0",
+    "@vercel/postgres": "^0.5.0",
     "csv-parser": "^3.0.0",
     "fs": "^0.0.1-security",
     "net": "^1.0.2",
