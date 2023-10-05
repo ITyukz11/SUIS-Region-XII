@@ -1,3 +1,9 @@
+export const config = {
+    api: {
+      responseLimit: false,
+    },
+  }
+  
 import { sql } from '@vercel/postgres';
 
 export default async function handler(request, response) {
@@ -34,8 +40,3 @@ export default async function handler(request, response) {
   }
 }
 
-export const config = {
-    api: {
-      responseLimit: false,
-    },
-  }
