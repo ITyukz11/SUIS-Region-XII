@@ -210,7 +210,7 @@ export default function ThreeA() {
     };
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${activeTab}`, postData);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/test-${activeTab}`, postData);
 
       if (!res.ok) {
         // Handle server error here (e.g., res.status >= 400)
