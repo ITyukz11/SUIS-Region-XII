@@ -36,7 +36,7 @@ export default function Saranganitable(props) {
 
     console.log("sortActive: ", sortActive)
 
-    const noNumberColumnDatas = ['First Name', 'Middle Name', 'Last Name', 'Gender','OCT/TCT Number'];
+    const noNumberColumnDatas = ['First Name', 'Middle Name', 'Last Name', 'Gender'];
 
     const sortedData = (column) => {
       
@@ -142,9 +142,7 @@ export default function Saranganitable(props) {
       case 'Gender':
         setSortActiveGender(!sortActiveGender)
         break;
-      case 'OCT/TCT Number':
-        setSortActiveOctTctNo(!sortActiveOctTctNo)
-        break;        
+       
       default:
         break;
     }
@@ -222,16 +220,7 @@ export default function Saranganitable(props) {
                   <MdSouth className={`transition-opacity ${showSortGender ? 'opacity-100' : 'opacity-0'} ${sortActiveGender?'rotate-180':'rotate-0'} `}/>
                    </span>              
                 </th>
-                <th scope="col"
-                  className={`px-6 py-3 hover:bg-gray-300 hover:cursor-pointer`}
-                  onMouseEnter={() => setShowSortOctTctNo(true)}
-                  onMouseLeave={() => setShowSortOctTctNo(false)}
-                  onClick={()=> handlesColumnSort('OCT/TCT Number')}>
-                   <span className='flex items-center justify-between'>
-                   OCT/TCT Number
-                  <MdSouth className={`transition-opacity ${showSortOctTctNo ? 'opacity-100' : 'opacity-0'} ${sortActiveOctTctNo?'rotate-180':'rotate-0'} `}/>
-                   </span>              
-                </th>
+ 
                 {/* {currentData.length > 0 && (
                   <tr>
                     {Object.keys(currentData[0]).map((column, index) => (
@@ -257,7 +246,6 @@ export default function Saranganitable(props) {
                   <td>{item['Middle Name']}</td>
                   <td>{item['Last Name']}</td>
                   <td>{item['Gender']}</td>
-                  <td>{item['OCT/TCT Number']}</td>
                 </tr>
               )):<tr>
               <td className='text-center' colSpan={7}>No Data Found!</td>

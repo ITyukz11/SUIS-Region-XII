@@ -1,7 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react'
 import Image from 'next/image'
 import { Fragment, useEffect, useState } from 'react'
-import { MdBrowserUpdated, MdHelp } from 'react-icons/md'
 
 export default function CountBlankModal(props) {
 
@@ -19,7 +18,6 @@ export default function CountBlankModal(props) {
     const [northCotMiddleName, setNorthCotMiddleName] = useState(0)
     const [northCotLastName, setNorthCotLastName] = useState(0)
     const [northCotGender, setNorthCotGender] = useState(0)
-    const [northCotOctTctNum, setNorthCotOctTctNum] = useState(0)
 
     //Sarangani
     const [saranganiSeqNo, setSaranganiSeqNo] = useState(0)
@@ -28,7 +26,6 @@ export default function CountBlankModal(props) {
     const [saranganiMiddleName, setSaranganiMiddleName] = useState(0)
     const [saranganiLastName, setSaranganiLastName] = useState(0)
     const [saranganiGender, setSaranganiGender] = useState(0)
-    const [saranganiOctTctNum, setSaranganiOctTctNum] = useState(0)
 
     //South Cotabato
     const [southCotSeqNo, setSouthCotSeqNo] = useState(0)
@@ -37,7 +34,6 @@ export default function CountBlankModal(props) {
     const [southCotMiddleName, setSouthCotMiddleName] = useState(0)
     const [southCotLastName, setSouthCotLastName] = useState(0)
     const [southCotGender, setSouthCotGender] = useState(0)
-    const [southCotOctTctNum, setSouthCotOctTctNum] = useState(0)
 
     //Sultan Kudarat
     const [sultanKudaratSeqNo, setSultanKudaratSeqNo] = useState(0)
@@ -46,7 +42,6 @@ export default function CountBlankModal(props) {
     const [sultanKudaratMiddleName, setSultanKudaratMiddleName] = useState(0)
     const [sultanKudaratLastName, setSultanKudaratLastName] = useState(0)
     const [sultanKudaratGender, setSultanKudaratGender] = useState(0)
-    const [sultanKudaratOctTctNum, setSultanKudaratOctTctNum] = useState(0)
 
     useEffect(() => {
         //Define first
@@ -56,7 +51,6 @@ export default function CountBlankModal(props) {
         const mn = 'Middle Name'
         const ln = 'Last Name'
         const gender = 'Gender'
-        const otnum = 'OCT/TCT Number'
 
         //North Cotabato Calculate blank counts
         const northcotseqnum = props.northCotData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
@@ -65,7 +59,6 @@ export default function CountBlankModal(props) {
         const northcotmd = props.northCotData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
         const northcotln = props.northCotData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
         const northcotgender = props.northCotData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
-        const northcototnum = props.northCotData.filter(obj => obj[otnum] === '' || obj[otnum] === null || obj[otnum] === undefined).length;
 
         //Sarangani Calculate blank counts
         const saranganiseqnum = props.saranganiData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
@@ -74,7 +67,6 @@ export default function CountBlankModal(props) {
         const saranganimd = props.saranganiData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
         const saranganiln = props.saranganiData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
         const saranganigender = props.saranganiData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
-        const saranganiotnum = props.saranganiData.filter(obj => obj[otnum] === '' || obj[otnum] === null || obj[otnum] === undefined).length;
         
         //South Cotabato Calculate blank counts
         const southcotseqnum = props.southCotData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
@@ -83,7 +75,6 @@ export default function CountBlankModal(props) {
         const southcotmd = props.southCotData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
         const southcotln = props.southCotData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
         const southcotgender = props.southCotData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
-        const southcototnum = props.southCotData.filter(obj => obj[otnum] === '' || obj[otnum] === null || obj[otnum] === undefined).length;
 
         //Sultan Kudarat Calculate blank counts
         const sultankudaratseqnum = props.sultanKudaratData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
@@ -92,15 +83,14 @@ export default function CountBlankModal(props) {
         const sultankudaratmd = props.sultanKudaratData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
         const sultankudaratln = props.sultanKudaratData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
         const sultankudaratgender = props.sultanKudaratData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
-        const sultankudaratotnum = props.sultanKudaratData.filter(obj => obj[otnum] === '' || obj[otnum] === null || obj[otnum] === undefined).length;
 
 
 
         //Total of all blanks
-        const northCotTotal = northcotseqnum + northcotarea + northcotfn + northcotmd + northcotln + northcotgender + northcototnum
-        const saranganiTotal = saranganiseqnum + saranganiarea + saranganifn + saranganimd + saranganiln + saranganigender + saranganiotnum
-        const southCotTotal = southcotseqnum + southcotarea + southcotfn + southcotmd + southcotln + southcotgender + southcototnum
-        const sultanKudaratTotal = sultankudaratseqnum + sultankudaratarea + sultankudaratfn + sultankudaratmd + sultankudaratln + sultankudaratgender + sultankudaratotnum
+        const northCotTotal = northcotseqnum + northcotarea + northcotfn + northcotmd + northcotln + northcotgender 
+        const saranganiTotal = saranganiseqnum + saranganiarea + saranganifn + saranganimd + saranganiln + saranganigender 
+        const southCotTotal = southcotseqnum + southcotarea + southcotfn + southcotmd + southcotln + southcotgender 
+        const sultanKudaratTotal = sultankudaratseqnum + sultankudaratarea + sultankudaratfn + sultankudaratmd + sultankudaratln + sultankudaratgender 
         
         const overallTotal = northCotTotal+saranganiTotal+southCotTotal+sultanKudaratTotal
 
@@ -117,7 +107,6 @@ export default function CountBlankModal(props) {
         setNorthCotMiddleName(northcotmd)
         setNorthCotLastName(northcotln)
         setNorthCotGender(northcotgender)
-        setNorthCotOctTctNum(northcototnum)
 
         // Sarangani Update state variables with counts
         setSaranganiSeqNo(saranganiseqnum);
@@ -126,7 +115,6 @@ export default function CountBlankModal(props) {
         setSaranganiMiddleName(saranganimd)
         setSaranganiLastName(saranganiln)
         setSaranganiGender(saranganigender)
-        setSaranganiOctTctNum(saranganiotnum)
 
         // South Cotabato Update state variables with counts
         setSouthCotSeqNo(southcotseqnum);
@@ -135,7 +123,6 @@ export default function CountBlankModal(props) {
         setSouthCotMiddleName(southcotmd)
         setSouthCotLastName(southcotln)
         setSouthCotGender(southcotgender)
-        setSouthCotOctTctNum(southcototnum)
 
         // Sultan Kudarat Update state variables with counts
         setSultanKudaratSeqNo(sultankudaratseqnum);
@@ -144,7 +131,6 @@ export default function CountBlankModal(props) {
         setSultanKudaratMiddleName(sultankudaratmd)
         setSultanKudaratLastName(sultankudaratln)
         setSultanKudaratGender(sultankudaratgender)
-        setSultanKudaratOctTctNum(sultankudaratotnum)
 
     }, [props.isOpen]);
     return (
@@ -238,13 +224,6 @@ export default function CountBlankModal(props) {
                                                 <td className="border p-2">{saranganiGender}</td>
                                                 <td className="border p-2">{southCotGender}</td>
                                                 <td className="border p-2">{sultanKudaratGender}</td>
-                                            </tr>
-                                            <tr className='border bg-white hover:bg-grey-primary '>
-                                                <td className="border p-2">OCT/TCT Number</td>
-                                                <td className="border p-2">{northCotOctTctNum}</td>
-                                                <td className="border p-2">{saranganiOctTctNum}</td>
-                                                <td className="border p-2">{southCotOctTctNum}</td>
-                                                <td className="border p-2">{sultanKudaratOctTctNum}</td>
                                             </tr>
                                             <tr className='border border-t-gray-500 border-t-2 bg-gray-100 hover:bg-grey-primary '>
                                                 <td className="border p-2 font-bold">TOTAL</td>
