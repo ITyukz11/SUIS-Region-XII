@@ -431,23 +431,13 @@ const handleFileChange = (e) => {
                 .on('data', (row) => {
                   const rowDataArray = Object.values(row);
                   const selectedData = {
-                    'start': rowDataArray[0],
-                    'end': rowDataArray[1],
-                    'today': rowDataArray[2],
-                    'username': rowDataArray[3],
-                    'phonenumber': rowDataArray[5],
-                    'audit': rowDataArray[6],
-                    'audit_URL': rowDataArray[7],
                     'Collective CLOA Sequence Number': rowDataArray[9],
-                    'OCT/TCT Number': rowDataArray[10],
                     'Collective CLOA Number': rowDataArray[11],
                     'First Name': rowDataArray[13],
                     'Middle Name': rowDataArray[14],
                     'Last Name': rowDataArray[15],
                     'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
                     'Gender': rowDataArray[23], // Use the found index, or an empty string if not found
-                    'Educational Attainment': rowDataArray[46],
-                    'Civil Status': rowDataArray[47],
                   };
                   datas.push(selectedData);
                 })
@@ -505,7 +495,7 @@ const handleFileChange = (e) => {
                       
                         console.log("help batchUploadStatus: ",batchUploadStatus)
                       Swal.close(); // Close the Swal dialog
-                      getEss3ADatas()
+                      //getEss3ADatas()
 
                                                     
 }
