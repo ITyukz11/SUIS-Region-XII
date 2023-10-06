@@ -10,22 +10,32 @@ export default async function handler(request, response) {
   // GET REQUESTS
   if (request.method === "GET") {
     try {
-      const { page = 1, pageSize = 100 } = request.query; // Extract page and pageSize query parameters
-      const offset = (page - 1) * pageSize; // Calculate the offset for pagination
-
-      //const result = await sql `SELECT * FROM ess_3a_north_cotabato`
-      const result = await sql `SELECT * FROM ess_3a_north_cotabato
-      LIMIT ${pageSize}
-      OFFSET ${offset}
-    `;
-
+      const { page = 1, pageSize = 1000, column = 'Collective CLOA Sequence Number', orderby = 'DESC' } = request.query; //Set up default values
+      const offset = (page - 1) * pageSize;
+      const sortcolumn = `"${column}"`; // Wrap the column name in double quotes, assuming it's a column identifier
+      const sortorderby = `${orderby}`;
+  
+      // const queryString = `
+      //   SELECT *
+      //   FROM ess_3a_north_cotabato
+      //   ORDER BY ${sortcolumn} ${sortorderby}
+      //   LIMIT ${pageSize}
+      //   OFFSET ${offset}
+      // `;
+      const queryString = `SELECT * FROM ess_3a_north_cotabato`
+      console.log(queryString);
+  
+      const result = await sql.query(queryString);
+  
       const finalData = result.rows;
+  
       return response.status(200).json(finalData);
     } catch (error) {
       console.error("Error fetching data:", error);
       response.status(500).json({ error: "Internal Server Error: " + error.message });
     }
   }
+  
 
   // POST REQUESTS
   if (request.method === "POST") {
