@@ -10,19 +10,19 @@ export default async function handler(request, response) {
   // GET REQUESTS
   if (request.method === "GET") {
     try {
-      const { page = 1, pageSize = 1000, column = 'Collective CLOA Sequence Number', orderby = 'DESC' } = request.query; //Set up default values
+      const { page = 1, pageSize = 5000, column = 'Collective CLOA Sequence Number', orderby = 'DESC' } = request.query; //Set up default values
       const offset = (page - 1) * pageSize;
       const sortcolumn = `"${column}"`; // Wrap the column name in double quotes, assuming it's a column identifier
       const sortorderby = `${orderby}`;
   
-      // const queryString = `
-      //   SELECT *
-      //   FROM ess_3a_north_cotabato
-      //   ORDER BY ${sortcolumn} ${sortorderby}
-      //   LIMIT ${pageSize}
-      //   OFFSET ${offset}
-      // `;
-      const queryString = `SELECT * FROM ess_3a_north_cotabato`
+      const queryString = `
+        SELECT *
+        FROM ess_3a_north_cotabato
+        ORDER BY ${sortcolumn} ${sortorderby}
+        LIMIT ${pageSize}
+        OFFSET ${offset}
+      `;
+  
       console.log(queryString);
   
       const result = await sql.query(queryString);

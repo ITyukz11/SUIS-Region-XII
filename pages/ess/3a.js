@@ -133,33 +133,58 @@ export default function ThreeA() {
         "Content-Type": "application/json"
       }
     };
-  const provinces = ['test-north-cotabato', 'test-sarangani', 'test-south-cotabato', 'test-sultan-kudarat'];
-
-    
-    provinces.forEach(async (province) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}`, postData);
-      const response = await res.json();
-      if (!response.error) {
-        switch (province) {
-          case 'test-north-cotabato':
-            setNorthCotData(response);
-            break;
-          case 'test-sarangani':
-            setSaranganiData(response);
-            break;
-          case 'test-south-cotabato':
-            setSouthCotData(response);
-            break;
-          case 'test-sultan-kudarat':
-            setSultanKudaratData(response);
-            break;
-          default:
-            break;
+    const provinces = ['test-north-cotabato', 'test-sarangani', 'test-south-cotabato', 'test-sultan-kudarat'];
+  
+    // Use Promise.all to make requests in parallel
+    const allPromises = provinces.map(async (province) => {
+      let page = 1;
+      let allData = [];
+  
+      while (true) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}?page=${page}`, postData);
+        const response = await res.json();
+  
+        if (response.error) {
+          console.error(`Error fetching data for ${province}: `, response.error);
+          break;
         }
-        console.log(`response for ${province}: `, response);
+  
+        if (response.length === 0) {
+          break; // No more data for this province
+        }
+  
+        allData = allData.concat(response); // Append data to the result array
+  
+        page++; // Increment page number for the next request
       }
+  
+      return { province, data: allData };
+    });
+  
+    const results = await Promise.all(allPromises);
+  
+    // Update state or handle the data as needed
+    results.forEach(({ province, data }) => {
+      switch (province) {
+        case 'test-north-cotabato':
+          setNorthCotData(data);
+          break;
+        case 'test-sarangani':
+          setSaranganiData(data);
+          break;
+        case 'test-south-cotabato':
+          setSouthCotData(data);
+          break;
+        case 'test-sultan-kudarat':
+          setSultanKudaratData(data);
+          break;
+        default:
+          break;
+      }
+      console.log(`response for ${province}: `, data);
     });
   }
+  
   
 
   async function getEss3ADatas() {
@@ -243,10 +268,10 @@ export default function ThreeA() {
 
 
   //FETCH DATAS
-  useEffect(() => {
+  useEffect(() => {  
     //getEss3ADatas()
     //getEss3ADatasTest()
-     getEss3ADatasTest2()
+    getEss3ADatasTest2()
   }, []);
 
   //Handling Upload Success
