@@ -1,9 +1,8 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, {useEffect, useRef, useState } from 'react'
 import Layout from '../../components/layout'
-import { MdFace3, MdFace6, MdFormatListNumbered, MdGroups2, MdMap, MdSearch, MdUpload,MdClose, MdExposureZero } from 'react-icons/md'
-import { Menu, Tab, Transition } from '@headlessui/react'
+import {MdFace3, MdFace6, MdFormatListNumbered, MdGroups2, MdMap, MdSearch, MdUpload,MdClose } from 'react-icons/md'
+import {Tab } from '@headlessui/react'
 import Image from 'next/image'
-import { BsChevronDown } from 'react-icons/bs'
 import Southcotabatotable from '../../components/ess/3a/tables/southcotabatotable'
 import csv from 'csv-parser'; // Import the csv-parser library
 import Northcotabatotable from '../../components/ess/3a/tables/northcotabatotable'
@@ -44,29 +43,6 @@ export default function ThreeA() {
   //Check if batches are complete uploading
   const [batchUploadStatus, setBatchUploadStatus] = useState(false)
   const [uploadingSuccess, setUploadingSuccess] = useState(false)
-  const [seqNoNorthCot, setSeqNoNorthCot] = useState()
-  const [areaNorthCot, setAreaNoNorthCot] = useState()
-  const [maleNorthCot, setMaleNorthCot] = useState()
-  const [femaleNorthCot, setFemaleNorthCot] = useState()
-  const [totalArbNorthCot, setTotalArbNorthCot] = useState()
-
-  const [seqNosouthCot, setSeqNoSouthCot] = useState()
-  const [areasouthCot, setAreaNoSouthCot] = useState()
-  const [malesouthCot, setMaleSouthCot] = useState()
-  const [femalesouthCot, setFemaleSouthCot] = useState()
-  const [totalArbsouthCot, setTotalArbSouthCot] = useState()
-
-  // const [seqNoNorthCot, setSeqNoNorthCot] = useState()
-  // const [areaNorthCot, setAreaNoNorthCot] = useState()
-  // const [maleNorthCot, setMaleNorthCot] = useState()
-  // const [femaleNorthCot, setFemaleNorthCot] = useState()
-  // const [totalArbNorthCot, setTotalArbNorthCot] = useState()
-
-  // const [seqNoNorthCot, setSeqNoNorthCot] = useState()
-  // const [areaNorthCot, setAreaNoNorthCot] = useState()
-  // const [maleNorthCot, setMaleNorthCot] = useState()
-  // const [femaleNorthCot, setFemaleNorthCot] = useState()
-  // const [totalArbNorthCot, setTotalArbNorthCot] = useState()
 
 
   // Define a function to handle tab selection
@@ -94,6 +70,97 @@ export default function ThreeA() {
     };
   }, []);
 
+  async function getEss3ADatasTest() {
+    const pageSize = 100; // Set the desired page size
+  
+    const postData = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+  
+    provinces.forEach(async (province) => {
+      let page = 1;
+      let allProvinceData = []; // Initialize an array to store all data for the province
+  
+      while (true) {
+        // Fetch data for the current page and province
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/test-north-cotabato?page=${page}`, postData);
+        const response = await res.json();
+  
+        if (!response.error) {
+          // Add the current page's data to the array
+          allProvinceData = [...allProvinceData, ...response];
+  
+          // If the response data length is less than the page size, it means there are no more pages
+          if (response.length < pageSize) {
+            break; // Exit the loop
+          }
+  
+          page++; // Move to the next page
+        } else {
+          break; // Exit the loop in case of an error
+        }
+      }
+  
+      // Set the state variable for the province with all the collected data
+      // switch (province) {
+      //   case 'north-cotabato':
+      //     setNorthCotData(allProvinceData);
+      //     break;
+      //   case 'sarangani':
+      //     setSaranganiData(allProvinceData);
+      //     break;
+      //   case 'south-cotabato':
+      //     setSouthCotData(allProvinceData);
+      //     break;
+      //   case 'sultan-kudarat':
+      //     setSultanKudaratData(allProvinceData);
+      //     break;
+      //   default:
+      //     break;
+      // }
+  
+      console.log(`Data for ${province}: `, allProvinceData);
+    });
+  }
+
+  async function getEss3ADatasTest2() {
+    const postData = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+  const provinces = ['test-north-cotabato', 'test-sarangani', 'test-south-cotabato', 'test-sultan-kudarat'];
+
+    
+    provinces.forEach(async (province) => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}`, postData);
+      const response = await res.json();
+      if (!response.error) {
+        switch (province) {
+          case 'test-north-cotabato':
+            setNorthCotData(response);
+            break;
+          case 'test-sarangani':
+            setSaranganiData(response);
+            break;
+          case 'test-south-cotabato':
+            setSouthCotData(response);
+            break;
+          case 'test-sultan-kudarat':
+            setSultanKudaratData(response);
+            break;
+          default:
+            break;
+        }
+        console.log(`response for ${province}: `, response);
+      }
+    });
+  }
+  
 
   async function getEss3ADatas() {
     const postData = {
@@ -127,7 +194,9 @@ export default function ThreeA() {
       }
     });
   }
-  
+
+ 
+
   async function uploadNewDatas(sql, values) {
     const postData = {
       method: "POST",
@@ -136,7 +205,7 @@ export default function ThreeA() {
       },
       body: JSON.stringify({
         sql: sql,
-        values: values     
+        values: values
       })
     };
 
@@ -175,7 +244,9 @@ export default function ThreeA() {
 
   //FETCH DATAS
   useEffect(() => {
-    getEss3ADatas()
+    //getEss3ADatas()
+    //getEss3ADatasTest()
+     getEss3ADatasTest2()
   }, []);
 
   //Handling Upload Success
@@ -223,7 +294,9 @@ if(batchUploadStatus){
   //Counting Sequence Number Function
   const countSequenceNo = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
-      return '-'; // return '-' if datas is not an array or is empty
+      return  <div role="status" className="max-w-sm animate-pulse" >
+                <div className="h-4 bg-gray-200 rounded-md dark:bg-gray-700 w-8 mb-4"></div>
+              </div>;
     }
     
     const seqNoCount = datas.reduce((count, item) => {
@@ -242,7 +315,9 @@ if(batchUploadStatus){
   // Function to count the occurrences of CLOA AREA
   const countAreas = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
-      return '-'; // return '-' if datas is not an array or is empty
+      return  <div role="status" className="max-w-sm animate-pulse">
+                <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+              </div>; // return '-' if datas is not an array or is empty
     }
     const cloaAreaCount = datas ? datas.reduce((count, item) => {
       // Check if the item has CLOA AREA data
@@ -259,7 +334,9 @@ if(batchUploadStatus){
 
   const countTotalMales = (datas)=> {
     if (!Array.isArray(datas) || datas.length === 0) {
-      return '-'; // return '-' if datas is not an array or is empty
+      return  <div role="status" className="max-w-sm animate-pulse">
+                <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+              </div>; // return '-' if datas is not an array or is empty
     }
     const maleNoCount = datas ? datas.reduce((count, item) => {
       // Check if the item has a SeqNo property
@@ -278,7 +355,9 @@ if(batchUploadStatus){
 
 const countTotalFemales = (datas) =>{
   if (!Array.isArray(datas) || datas.length === 0) {
-    return '-'; // return '-' if datas is not an array or is empty
+    return  <div role="status" className="max-w-sm animate-pulse">
+                <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+              </div>; // return '-' if datas is not an array or is empty
   }
   const femaleNoCount = datas ? datas.reduce((count, item) => {
     // Check if the item has a SeqNo property
@@ -296,7 +375,9 @@ const countTotalFemales = (datas) =>{
  
 const countTotalARBs =(datas)=>{
   if (!Array.isArray(datas) || datas.length === 0) {
-    return '-'; // return '-' if datas is not an array or is empty
+    return  <div role="status" className="max-w-sm animate-pulse">
+                <div className="h-4 mt-auto bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+              </div>; // return '-' if datas is not an array or is empty
   }
   const totalARB = datas ? datas.reduce((count, item) => {
     // Check if the item has a SeqNo property
@@ -316,20 +397,6 @@ const handleFileChange = (e) => {
   setSelectedFile(file);
   setUploadingStatus(true);
 };
-
-
-
-//  const handleUpload2 = () => {
-//   const sql = 'INSERT INTO ess_3a_north_cotabato(start, "end", today, username, phonenumber, audit, "audit_URL", "Collective CLOA Sequence Number", "OCT/TCT Number", "Collective CLOA Number", "First Name", "Middle Name", "Last Name", "Actual area of tillage/cultivation (in square meters)", "Gender", "Educational Attainment", "Civil Status") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17), ($18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34)';
-  
-//   const values = [
-//     'mary', '2', '3', '4', '5', '6', 'yury', '8', '9', '2', '3', '1', '2', '3', '4', '2', '1',
-//     'yuki', '2', '3', '4', '5', '6', 'yuna', '8', '9', '2', '3', '1', '2', '3', '4', '2', '1'
-//   ];
-
-//   uploadNewDatas(sql, values);
-// }
-
 
 
   const handleUpload = () => {
@@ -407,10 +474,10 @@ const handleFileChange = (e) => {
                 const columns = Object.keys(batch[0]); // Assuming all objects have the same keys
                 const columnsWithDoubleQuote = columns.map((column) => `"${column}"`);
                 const placeholders = batch
-                  .map(() =>
-                    `(${columns.map(() => `$${parameterIndex++}`).join(', ')})`
-                  )
-                  .join(', ');
+                .map(() =>
+                  `(${columns.map(() => `$${parameterIndex++}`).join(', ')})`
+                )
+                .join(', ');
 
                 // Reset the parameterIndex to 1 when it reaches 100
                 if (parameterIndex > 100) {
@@ -420,7 +487,7 @@ const handleFileChange = (e) => {
                 const values = batch.flatMap((obj) => columns.map((col) => obj[col]));
 
 
-                const sql = `INSERT INTO suis.ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
+                const sql = `INSERT INTO ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
                 console.log('SQL:', sql);
                 console.log('Batch Size:', batch.length);
 
@@ -531,28 +598,28 @@ const handleFileChange = (e) => {
             <div className='w-fit flex flex-col text-left justify-start items-center'>
               <MdFormatListNumbered className='text-5xl' />
               <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-green-700 text-2xl'>{countSequenceNo(northCotData)}</label>
+              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countSequenceNo(northCotData)}</label>
             </div>
 
             <div className='w-fit flex flex-col text-center justify-start items-center'>
               <MdMap className='text-5xl' />
               <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-green-700 text-2xl'>{countAreas(northCotData)}</label>
+              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countAreas(northCotData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace6 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-green-700 text-2xl'>{countTotalMales(northCotData)}</label>
+              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countTotalMales(northCotData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace3 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-green-700 text-2xl'>{countTotalFemales(northCotData)}</label>
+              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countTotalFemales(northCotData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdGroups2 className='text-4xl' />
               <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-green-700 text-4xl'>{countTotalARBs(northCotData)}</label>
+              <label className='font-black text-green-700 text-4xl mt-auto'>{countTotalARBs(northCotData)}</label>
             </div>
 
           </div>
@@ -563,28 +630,28 @@ const handleFileChange = (e) => {
             <div className='w-fit flex flex-col text-left justify-start items-center'>
               <MdFormatListNumbered className='text-5xl' />
               <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-blue-700 text-2xl'>{countSequenceNo(southCotData)}</label>
+              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countSequenceNo(southCotData)}</label>
             </div>
 
             <div className='w-fit flex flex-col text-center justify-start items-center'>
               <MdMap className='text-5xl' />
               <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-blue-700 text-2xl'>{countAreas(southCotData)}</label>
+              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countAreas(southCotData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace6 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-blue-700 text-2xl'>{countTotalMales(southCotData)}</label>
+              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countTotalMales(southCotData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace3 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-blue-700 text-2xl'>{countTotalFemales(southCotData)}</label>
+              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countTotalFemales(southCotData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdGroups2 className='text-4xl' />
               <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-blue-700 text-4xl'>{countTotalARBs(southCotData)}</label>
+              <label className='font-black text-blue-700 text-4xl mt-auto'>{countTotalARBs(southCotData)}</label>
             </div>
 
           </div>
@@ -594,28 +661,28 @@ const handleFileChange = (e) => {
             <div className='w-fit flex flex-col text-left justify-start items-center'>
               <MdFormatListNumbered className='text-5xl' />
               <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-yellow-600 text-2xl'>{countSequenceNo(saranganiData)}</label>
+              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countSequenceNo(saranganiData)}</label>
             </div>
 
             <div className='w-fit flex flex-col text-center justify-start items-center'>
               <MdMap className='text-5xl' />
               <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-yellow-600 text-2xl'>{countAreas(saranganiData)}</label>
+              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countAreas(saranganiData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace6 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-yellow-600 text-2xl'>{countTotalMales(saranganiData)}</label>
+              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countTotalMales(saranganiData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace3 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-yellow-600 text-2xl'>{countTotalFemales(saranganiData)}</label>
+              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countTotalFemales(saranganiData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdGroups2 className='text-4xl' />
               <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-yellow-600 text-4xl'>{countTotalARBs(saranganiData)}</label>
+              <label className='font-black text-yellow-600 text-4xl mt-auto'>{countTotalARBs(saranganiData)}</label>
             </div>
 
           </div>
@@ -625,28 +692,28 @@ const handleFileChange = (e) => {
             <div className='w-fit flex flex-col text-left justify-start items-center'>
               <MdFormatListNumbered className='text-5xl' />
               <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-gray-600 text-2xl'>{countSequenceNo(sultanKudaratData)}</label>
+              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countSequenceNo(sultanKudaratData)}</label>
             </div>
 
             <div className='w-fit flex flex-col text-center justify-start items-center'>
               <MdMap className='text-5xl' />
               <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-gray-600 text-2xl'>{countAreas(sultanKudaratData)}</label>
+              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countAreas(sultanKudaratData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace6 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-gray-600 text-2xl'>{countTotalMales(sultanKudaratData)}</label>
+              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countTotalMales(sultanKudaratData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdFace3 className='text-5xl' />
               <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-gray-600 text-2xl'>{countTotalFemales(sultanKudaratData)}</label>
+              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countTotalFemales(sultanKudaratData)}</label>
             </div>
             <div className=' w-fit flex flex-col text-center justify-start items-center'>
               <MdGroups2 className='text-4xl' />
               <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-gray-600 text-4xl'>{countTotalARBs(sultanKudaratData)}</label>
+              <label className='font-black text-gray-600 text-4xl mt-auto'>{countTotalARBs(sultanKudaratData)}</label>
             </div>
 
           </div>
