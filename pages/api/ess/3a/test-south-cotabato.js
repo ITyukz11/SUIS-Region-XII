@@ -10,16 +10,16 @@ export default async function handler(request, response) {
   // GET REQUESTS
   if (request.method === "GET") {
     try {
-      const { page = 1, pageSize = 100 } = request.query; // Extract page and pageSize query parameters
+      const { page = 1, pageSize = 10000 } = request.query; // Extract page and pageSize query parameters
       const offset = (page - 1) * pageSize; // Calculate the offset for pagination
 
-      const result = await sql `SELECT * FROM ess_3a_north_cotabato`
+      //const result = await sql `SELECT * FROM ess_3a_north_cotabato`
       //const result = await sql `SELECT * FROM ess_3a_south_cotabato`
       
-      //   const result = await sql `SELECT * FROM ess_3a_north_cotabato
-      //   LIMIT ${pageSize}
-      //   OFFSET ${offset}
-      // `;
+        const result = await sql `SELECT * FROM ess_3a_north_cotabato
+        LIMIT ${pageSize}
+        OFFSET ${offset}
+      `;
 
       const finalData = result.rows;
       return response.status(200).json(finalData);
