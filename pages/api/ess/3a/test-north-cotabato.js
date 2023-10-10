@@ -10,18 +10,12 @@ export default async function handler(request, response) {
   // GET REQUESTS
   if (request.method === "GET") {
     try {
-      const { page = 1, pageSize = 5000, column = 'Collective CLOA Sequence Number', orderby = 'DESC' } = request.query; //Set up default values
-      const offset = (page - 1) * pageSize;
-      const sortcolumn = `"${column}"`; // Wrap the column name in double quotes, assuming it's a column identifier
-      const sortorderby = `${orderby}`;
+    //  const { page = 1, pageSize = 5000, column = 'Collective CLOA Sequence Number', orderby = 'DESC' } = request.query; //Set up default values
+    //  const offset = (page - 1) * pageSize;
+    //  const sortcolumn = `"${column}"`; // Wrap the column name in double quotes, assuming it's a column identifier
+    //  const sortorderby = `${orderby}`;
   
-      const queryString = `
-        SELECT *
-        FROM ess_3a_north_cotabato
-        ORDER BY ${sortcolumn} ${sortorderby}
-        LIMIT ${pageSize}
-        OFFSET ${offset}
-      `;
+      const queryString = `SELECT * FROM ess_3a_north_cotabato`;
   
       console.log(queryString);
   
@@ -35,26 +29,26 @@ export default async function handler(request, response) {
       response.status(500).json({ error: "Internal Server Error: " + error.message });
     }
   }
+    // POST REQUESTS
+    if (request.method === "POST") {
+      const { sql: query, values } = request.body; // Extract SQL query and values from the request body
+      console.log("request.body.sql", request.body.sql)
+      console.log("request.body.values", request.body.values)
+
+      try {
+        // Execute the SQL query with the provided values
+        const result = await sql.query(query, values);
   
-
-  // POST REQUESTS
-  if (request.method === "POST") {
-    const { sql: query, values } = request.body; // Extract SQL query and values from the request body
-    
-    try {
-      // Execute the SQL query with the provided values
-      const result = await sql.query(query, values);
-
-      // If no error is thrown, consider the operation successful
-      response.status(201).json({ message: "Success", result });
-    } catch (error) {
-      console.error("Error inserting data:", error);
-      console.error("Query:", query);
-      console.error("Values:", values);
-      response.status(500).json({ error: "Internal Server Error: " + error.message });
+        // If no error is thrown, consider the operation successful
+        response.status(201).json({ message: "Success", result });
+      } catch (error) {
+        console.error("Error inserting data:", error);
+        console.error("Query:", query);
+        console.error("Values:", values);
+        response.status(500).json({ error: "Internal Server Error: " + error.message });
+      }
+    } else {
+      response.status(405).json({ error: "Method Not Allowed" });
     }
-  } else {
-    response.status(405).json({ error: "Method Not Allowed" });
-  }
 }
 

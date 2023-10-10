@@ -1,36 +1,40 @@
 export const config = {
-    api: {
-      responseLimit: false,
-    },
-  }
-  
+  api: {
+    responseLimit: false,
+  },
+}
+
 import { sql } from '@vercel/postgres';
 
 export default async function handler(request, response) {
-  // GET REQUESTS
-  if (request.method === "GET") {
-    try {
-      const { page = 1, pageSize = 5000 } = request.query; // Extract page and pageSize query parameters
-      const offset = (page - 1) * pageSize; // Calculate the offset for pagination
+// GET REQUESTS
+if (request.method === "GET") {
+  try {
+  //  const { page = 1, pageSize = 5000, column = 'Collective CLOA Sequence Number', orderby = 'DESC' } = request.query; //Set up default values
+  //  const offset = (page - 1) * pageSize;
+  //  const sortcolumn = `"${column}"`; // Wrap the column name in double quotes, assuming it's a column identifier
+  //  const sortorderby = `${orderby}`;
 
-      //const result = await sql `SELECT * FROM ess_3a_sarangani`
-        const result = await sql `SELECT * FROM ess_3a_sarangani
-        LIMIT ${pageSize}
-        OFFSET ${offset}
-      `;
+    const queryString = `SELECT * FROM ess_3a_sarangani`;
 
-      const finalData = result.rows;
-      return response.status(200).json(finalData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      response.status(500).json({ error: "Internal Server Error: " + error.message });
-    }
+    console.log(queryString);
+
+    const result = await sql.query(queryString);
+
+    const finalData = result.rows;
+
+    return response.status(200).json(finalData);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    response.status(500).json({ error: "Internal Server Error: " + error.message });
   }
-
+}
   // POST REQUESTS
   if (request.method === "POST") {
     const { sql: query, values } = request.body; // Extract SQL query and values from the request body
-    
+    console.log("request.body.sql", request.body.sql)
+    console.log("request.body.values", request.body.values)
+
     try {
       // Execute the SQL query with the provided values
       const result = await sql.query(query, values);
