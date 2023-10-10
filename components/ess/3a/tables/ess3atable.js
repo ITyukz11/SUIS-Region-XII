@@ -27,6 +27,8 @@ export default function Ess3aTable(props) {
     const [sortActiveLastName, setSortActiveLastName]=useState(false);
     const [sortActiveGender, setSortActiveGender]=useState(false);
 
+  //CHECK IF LOCALHOST OR ONLINE
+  const isLocalhost = process.env.NEXT_PUBLIC_URL.includes('localhost');
 
     // Calculate the index range for the current page
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -244,7 +246,7 @@ export default function Ess3aTable(props) {
                   <td>{item['Gender']}</td>
                 </tr>
               )):<tr>
-              <td className='text-center' colSpan={7}>No Data Found!</td>
+              <td className='text-center' colSpan={7}>{isLocalhost? 'No Data Found!':'Sorry raw datas are only available locally!'}</td>
               </tr>}
             </tbody>
           </table>
@@ -269,14 +271,14 @@ export default function Ess3aTable(props) {
           </label>
           <button
             onClick={nextPage}
-            disabled={currentPage === Math.ceil(props.tableData.length / itemsPerPage)}
+            disabled={currentPage === Math.ceil(props.tableData.length / itemsPerPage) || props.tableData.length == 0}
             className="bg-navy-primary text-white px-4 py-2 rounded-md disabled:bg-gray-300 hover:bg-opacity-95"
           >
             Next
           </button>
           <button
             onClick={endPage}
-            disabled={currentPage === Math.ceil(props.tableData.length / itemsPerPage)}
+            disabled={currentPage === Math.ceil(props.tableData.length / itemsPerPage)  || props.tableData.length == 0}
             className="bg-navy-primary text-white px-4 py-2 rounded-md disabled:bg-gray-300 hover:bg-opacity-95"
           >
             End
