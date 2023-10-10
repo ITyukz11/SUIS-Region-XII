@@ -3,13 +3,11 @@ import Layout from '../../components/layout'
 import {MdFace3, MdFace6, MdFormatListNumbered, MdGroups2, MdMap, MdSearch, MdUpload,MdClose } from 'react-icons/md'
 import {Tab } from '@headlessui/react'
 import Image from 'next/image'
-import Southcotabatotable from '../../components/ess/3a/tables/southcotabatotable'
 import csv from 'csv-parser'; // Import the csv-parser library
-import Northcotabatotable from '../../components/ess/3a/tables/northcotabatotable'
 import Swal from 'sweetalert2'
-import Saranganitable from '../../components/ess/3a/tables/saranganitable'
-import Sultankudarattable from '../../components/ess/3a/tables/sultankudarattable'
 import CountBlankModal from '../../components/ess/3a/modals/countblankmodal'
+import DisableModal from '../../components/ess/3a/modals/disablemodal'
+import Ess3aTable from '../../components/ess/3a/tables/ess3atable'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -28,6 +26,7 @@ export default function ThreeA() {
 
   //Modal for counting blanks
   const [showCountBlankModal, setShowCountBlankModal] = useState(false)
+  const [showDisableModal, setShowDisableModal] = useState(false)
 
   const inputRef = useRef(null);
 
@@ -44,6 +43,8 @@ export default function ThreeA() {
   const [batchUploadStatus, setBatchUploadStatus] = useState(false)
   const [uploadingSuccess, setUploadingSuccess] = useState(false)
 
+  //CHECK IF LOCALHOST OR ONLINE
+  const isLocalhost = process.env.NEXT_PUBLIC_URL.includes('localhost');
 
   // Define a function to handle tab selection
   const handleTabChange = (menu) => {
@@ -70,62 +71,7 @@ export default function ThreeA() {
     };
   }, []);
 
-  async function getEss3ADatasTest() {
-    const pageSize = 100; // Set the desired page size
-  
-    const postData = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-  
-    provinces.forEach(async (province) => {
-      let page = 1;
-      let allProvinceData = []; // Initialize an array to store all data for the province
-  
-      while (true) {
-        // Fetch data for the current page and province
-        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/test-north-cotabato?page=${page}`, postData);
-        const response = await res.json();
-  
-        if (!response.error) {
-          // Add the current page's data to the array
-          allProvinceData = [...allProvinceData, ...response];
-  
-          // If the response data length is less than the page size, it means there are no more pages
-          if (response.length < pageSize) {
-            break; // Exit the loop
-          }
-  
-          page++; // Move to the next page
-        } else {
-          break; // Exit the loop in case of an error
-        }
-      }
-  
-      // Set the state variable for the province with all the collected data
-      // switch (province) {
-      //   case 'north-cotabato':
-      //     setNorthCotData(allProvinceData);
-      //     break;
-      //   case 'sarangani':
-      //     setSaranganiData(allProvinceData);
-      //     break;
-      //   case 'south-cotabato':
-      //     setSouthCotData(allProvinceData);
-      //     break;
-      //   case 'sultan-kudarat':
-      //     setSultanKudaratData(allProvinceData);
-      //     break;
-      //   default:
-      //     break;
-      // }
-  
-      console.log(`Data for ${province}: `, allProvinceData);
-    });
-  }
-
+//FOR ONLINE 
   async function getEss3ADatasTest2() {
     const postData = {
       method: "GET",
@@ -235,7 +181,7 @@ export default function ThreeA() {
     };
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/test-${activeTab}`, postData);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${activeTab}`, postData);
 
       if (!res.ok) {
         // Handle server error here (e.g., res.status >= 400)
@@ -266,12 +212,92 @@ export default function ThreeA() {
     }
   }
 
+  async function deleteOldDatas(sql, values) {
+    const postData = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        sql: sql,
+      })
+    };
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${activeTab}`, postData);
+
+      if (!res.ok) {
+        // Handle server error here (e.g., res.status >= 400)
+        const errorResponse = await res.json();
+        const errorMessage = errorResponse.error || "Server error occurred";
+        console.log("Error MessageZXC: ", errorMessage);
+        setErrorPostReq(await errorMessage); // Set the error message in state
+
+          setErrorActive(true)
+        
+        return;
+        
+      }
+
+      const response = await res.json();
+      console.log("response: ", response)
+      if (response.message === "Success") {
+        console.log("Success: ", response)   
+        console.log("Deleted Success:")
+      } else {
+        console.log("Failed", response)
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  }
+
+  async function uploadToOnline(sql, values) {
+    const postData = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        sql: sql,
+        values: values
+      })
+    };
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/test-${activeTab}`, postData);
+
+      if (!res.ok) {
+        // Handle server error here (e.g., res.status >= 400)
+        const errorResponse = await res.json();
+        const errorMessage = errorResponse.error || "Server error occurred";
+        console.log("Error MessageZXC: ", errorMessage);
+        setErrorPostReq(await errorMessage); // Set the error message in state
+
+          setErrorActive(true)
+        
+        return;
+        
+      }
+
+      const response = await res.json();
+      console.log("response: ", response)
+      if (response.message === "Success") {
+        console.log("Success: ", response)   
+        console.log("Deleted Success:")
+      } else {
+        console.log("Failed", response)
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  }
 
   //FETCH DATAS
   useEffect(() => {  
-    //getEss3ADatas()
+    getEss3ADatas()
     //getEss3ADatasTest()
-    getEss3ADatasTest2()
+    //getEss3ADatasTest2()
   }, []);
 
   //Handling Upload Success
@@ -455,14 +481,26 @@ const handleFileChange = (e) => {
               csv({ separator: ',' }) // You can specify the separator here if it's not a comma
                 .on('data', (row) => {
                   const rowDataArray = Object.values(row);
-                  const selectedData = {
+                  console.log("rowDataArray: ",rowDataArray)
+                  const selectedData = {  // Use the found index, or an empty string if not found
+                    'start': rowDataArray[0],
+                    'end': rowDataArray[1],
+                    'today': rowDataArray[2],
+                    'username': rowDataArray[3],
+                    'phonenumber': rowDataArray[5],
+                    'audit': rowDataArray[6],
+                    'audit_URL': rowDataArray[7],
                     'Collective CLOA Sequence Number': rowDataArray[9],
+                    'OCT/TCT Number': rowDataArray[10],
                     'Collective CLOA Number': rowDataArray[11],
                     'First Name': rowDataArray[13],
                     'Middle Name': rowDataArray[14],
                     'Last Name': rowDataArray[15],
                     'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
-                    'Gender': rowDataArray[23], // Use the found index, or an empty string if not found
+                    'Gender': rowDataArray[23],
+                    'Educational Attainment': rowDataArray[46],
+                    'Civil Status': rowDataArray[47],
+
                   };
                   datas.push(selectedData);
                 })
@@ -485,6 +523,15 @@ const handleFileChange = (e) => {
               let parameterIndex = 1; // Initialize the parameter index
 
               // Loop through batches and insert data
+              let currentTab = activeTab=='north-cotabato'?northCotData:activeTab=="sarangani"?saranganiData:activeTab=="south-cotabato"?southCotData:activeTab=="sultan-kudarat"?sultanKudaratData:''
+
+              if(currentTab.length>1){
+                const sql = `DELETE FROM suis.ess_3a_${activeTab.replace(/-/g, "_")}`;
+                console.log('SQL:', sql); 
+                await deleteOldDatas(sql)  
+                
+              }
+
               for (const batch of batches) {
                 const columns = Object.keys(batch[0]); // Assuming all objects have the same keys
                 const columnsWithDoubleQuote = columns.map((column) => `"${column}"`);
@@ -502,7 +549,7 @@ const handleFileChange = (e) => {
                 const values = batch.flatMap((obj) => columns.map((col) => obj[col]));
 
 
-                const sql = `INSERT INTO ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
+                const sql = `INSERT INTO suis.ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
                 console.log('SQL:', sql);
                 console.log('Batch Size:', batch.length);
 
@@ -517,15 +564,25 @@ const handleFileChange = (e) => {
                       // Perform any actions you need after all batches are done
                       setBatchUploadStatus(true);
                         console.log('All batches completed');
+                       await getEss3ADatas().then(()=>{
+
+                               //QUERY ONLINE for every newly uploaded do upload in online vercel postgres too
+                      const totals = ['SeqNo','Area','Male','Female','TotalARB']
+
+                      totals.forEach(total => {
+                        let values = total=='SeqNo'?countSequenceNo(currentTab):total=='Area'?countAreas(currentTab):total=='Male'?countTotalMales(currentTab):total=='Female'?countTotalFemales(currentTab):total=="TotalARB"?countTotalARBs(currentTab):''
+                        const sqlOnline = `INSERT INTO ess_3a_${total}_${activeTab.replace(/-/g, "_")} (${total}) VALUES ${values}`;
+                        console.log("sqlOnline: ", sqlOnline)
+                      });
+                       })
                       
+                 
+                   
                         console.log("help batchUploadStatus: ",batchUploadStatus)
                       Swal.close(); // Close the Swal dialog
-                      //getEss3ADatas()
 
-                                                    
-}
-                  })
-                  .catch((error) => {
+                    }
+                  }).catch((error) => {
                     // Handle errors if needed
                     console.error('Error:', error);
                     Swal.fire({
@@ -536,6 +593,10 @@ const handleFileChange = (e) => {
                       confirmButtonColor: '#053B50'
                     });
                   });
+
+               
+                
+
               }
             };
             reader.readAsText(selectedFile); // Read the file as text
@@ -774,9 +835,8 @@ const handleFileChange = (e) => {
               )}
               <div
                 className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
-                onClick={openFileInput}
+                onClick={isLocalhost ? openFileInput : ()=> setShowDisableModal(true)} // Disable the onClick event if isLocalhost is false
               >
-
                 <MdUpload className='text-2xl' />
                 <label className='cursor-pointer'>
                   Upload New Data
@@ -784,11 +844,11 @@ const handleFileChange = (e) => {
                 <input
                   ref={inputRef}
                   type='file'
-                  accept='.csv' // You can specify the accepted file types if needed
-                  className="hidden" // Hide the default file input
+                  accept='.csv'
+                  className="hidden"
                   onChange={handleFileChange}
+                  disabled={!isLocalhost} // Disable the input element if isLocalhost is false
                 />
-
               </div>
             </div>
 
@@ -865,12 +925,10 @@ const handleFileChange = (e) => {
 
               </Tab.List>
               <Tab.Panels className="mt-2  ">
-
-                <Tab.Panel><Northcotabatotable northCotData={northCotData? filteredNorthCotData: []} isMobile={isMobile}/></Tab.Panel>
-                <Tab.Panel><Saranganitable saranganiData={saranganiData? filteredSaranganiData:[]} isMobile={isMobile}/></Tab.Panel>
-                <Tab.Panel><Southcotabatotable southCotData={southCotData ? filteredSouthCotData: []} isMobile={isMobile}/></Tab.Panel>
-                <Tab.Panel><Sultankudarattable sultanKudaratData={sultanKudaratData? filteredSultanKudaratData:[]} isMobile={isMobile}/></Tab.Panel>
-
+                <Tab.Panel><Ess3aTable tableData={northCotData? filteredNorthCotData: []} isMobile={isMobile}/></Tab.Panel>
+                <Tab.Panel><Ess3aTable tableData={saranganiData? filteredSaranganiData:[]} isMobile={isMobile}/></Tab.Panel>
+                <Tab.Panel><Ess3aTable tableData={southCotData ? filteredSouthCotData: []} isMobile={isMobile}/></Tab.Panel>
+                <Tab.Panel><Ess3aTable tableData={sultanKudaratData? filteredSultanKudaratData:[]} isMobile={isMobile}/></Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
 
@@ -885,6 +943,9 @@ const handleFileChange = (e) => {
         northCotData={northCotData}
         saranganiData={saranganiData}
         sultanKudaratData={sultanKudaratData}/>
+      <DisableModal
+        isOpen={showDisableModal}
+        isClose={()=> setShowDisableModal(!showDisableModal)}/>
     </div>
   )
 }
