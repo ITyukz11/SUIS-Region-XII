@@ -20,7 +20,7 @@ export default function ProvinceDataModal(props) {
                         <div className="fixed inset-0 bg-black bg-opacity-25" />
                     </Transition.Child>
 
-                    <div className="fixed inset-0 overflow-y-auto ">
+                    <div className="fixed inset-0">
                         <div className="flex items-center justify-center p-4 text-center">
                             <Transition.Child
                                 as={Fragment}
@@ -42,7 +42,8 @@ export default function ProvinceDataModal(props) {
                                            <Image src='/images/RPS-Logo.png' height={50} width={50} alt='RPS-Logo'/>
                                         </div>
                                     </Dialog.Title>
-                                    <table className="border border-collapse">
+                                    <div className='overflow-y-auto flex justify-center w-full h-[80vh]'>
+                                    <table className="border border-collapse w-full">
                                         <thead>
                                             <tr className='border text-gray-700 uppercase bg-gray-200'>
                                                 <th className='border p-2'>Particulars</th>
@@ -60,6 +61,8 @@ export default function ProvinceDataModal(props) {
                                                 : <tr><td colSpan="2" className="border p-2">No data available</td></tr>}
                                         </tbody>
                                     </table>
+                                    </div>
+                              
                                     <div className="mt-4">
                                         <button
                                             type="button"
