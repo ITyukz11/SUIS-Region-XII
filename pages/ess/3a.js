@@ -19,6 +19,18 @@ export default function ThreeA() {
   const [saranganiData, setSaranganiData] = useState([]);
   const [sultanKudaratData, setSultanKudaratData] = useState([]);
 
+  const [localStorageTotalSeqNo, setLocalStorageTotalSeqNo] = useState()
+  const [localStorageTotalArea, setLocalStorageTotalArea] = useState()
+  const [localStorageTotalMale, setLocalStorageTotalMale] = useState()
+  const [localStorageTotalFemale, setLocalStorageTotalFemale] = useState()
+  const [localStorageTotalARB, setLocalStorageTotalARB] = useState()
+
+  const [totalSeqNo, setTotalSeqNo] = useState()
+  const [totalArea, setTotalArea] = useState()
+  const [totalMale, setTotalMale] = useState()
+  const [totalFemale, setTotalFemale] = useState()
+  const [totalARB, setTotalARB] = useState()
+
   const [isMobile, setIsMobile] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingStatus, setUploadingStatus] = useState(false)
@@ -53,13 +65,13 @@ export default function ThreeA() {
 
   useEffect(() => {
     // Check if the screen width is less than a certain value (e.g., 768 for mobile devices)
-    const isMobileDevice = window.innerWidth < 768;
+    const isMobileDevice = window.innerWidth < 1025;
 
     setIsMobile(isMobileDevice);
 
     // Listen for window resize events to update the state when the screen size changes
     const handleResize = () => {
-      const isMobileDevice = window.innerWidth < 768;
+      const isMobileDevice = window.innerWidth < 1025;
       setIsMobile(isMobileDevice);
     };
 
@@ -310,9 +322,9 @@ export default function ThreeA() {
 
   //FETCH DATAS
   useEffect(() => {
-    if(isLocalhost){
+    if (isLocalhost) {
       getEss3ADatas()
-    }else{
+    } else {
       getEss3ADatasTest2()
     }
   }, []);
@@ -368,7 +380,7 @@ export default function ThreeA() {
     }
 
     let seqNoCount = 0
-    if(isLocalhost){
+    if (isLocalhost) {
       seqNoCount = datas.reduce((count, item) => {
         // Check if the item has a SeqNo property
         if (item['Collective CLOA Sequence Number']) {
@@ -377,9 +389,9 @@ export default function ThreeA() {
         }
         return count;
       }, 0);
-    }else{
+    } else {
       seqNoCount = datas[0].seqno
-      console.log("datas: ",datas)
+      console.log("datas: ", datas)
     }
 
 
@@ -395,10 +407,10 @@ export default function ThreeA() {
       </div>; // return '-' if datas is not an array or is empty
     }
     let cloaAreaCount = 0
-    if(isLocalhost){
+    if (isLocalhost) {
       cloaAreaCount = datas ? datas.reduce((count, item) => {
         // Check if the item has CLOA AREA data
-  
+
         const area = item['Actual area of tillage/cultivation (in square meters)']
         if (area && area != 0) {
           // Increment the count by 1 for each occurrence of CLOA AREA
@@ -406,7 +418,7 @@ export default function ThreeA() {
         }
         return count;
       }, 0) : '';
-    }else{
+    } else {
       cloaAreaCount = datas[0].area
     }
     return cloaAreaCount;
@@ -419,10 +431,10 @@ export default function ThreeA() {
       </div>; // return '-' if datas is not an array or is empty
     }
     let maleNoCount = 0
-    if(isLocalhost){
+    if (isLocalhost) {
       maleNoCount = datas ? datas.reduce((count, item) => {
         // Check if the item has a SeqNo property
-  
+
         //Change to lowercase to match other cases
         const gender = item.Gender != null ? item.Gender.toLowerCase() : ''
         if (gender == "male") {
@@ -431,7 +443,7 @@ export default function ThreeA() {
         }
         return count;
       }, 0) : '';
-    }else{
+    } else {
       maleNoCount = datas[0].male
     }
     return maleNoCount;
@@ -444,22 +456,22 @@ export default function ThreeA() {
         <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
       </div>; // return '-' if datas is not an array or is empty
     }
-   let femaleNoCount = 0 
-   if(isLocalhost){
-     femaleNoCount = datas ? datas.reduce((count, item) => {
-      // Check if the item has a SeqNo property
+    let femaleNoCount = 0
+    if (isLocalhost) {
+      femaleNoCount = datas ? datas.reduce((count, item) => {
+        // Check if the item has a SeqNo property
 
-      //Change to lowercase to match other cases
-      const gender = item.Gender != null ? item.Gender.toLowerCase() : ''
-      if (gender == "female") {
-        // Increment the count by 1 for each occurrence of SeqNo
-        return count + 1;
-      }
-      return count;
-    }, 0) : '';
-   }else{
-    femaleNoCount = datas[0].female
-   }
+        //Change to lowercase to match other cases
+        const gender = item.Gender != null ? item.Gender.toLowerCase() : ''
+        if (gender == "female") {
+          // Increment the count by 1 for each occurrence of SeqNo
+          return count + 1;
+        }
+        return count;
+      }, 0) : '';
+    } else {
+      femaleNoCount = datas[0].female
+    }
     return femaleNoCount;
   }
 
@@ -469,23 +481,81 @@ export default function ThreeA() {
         <div className="h-4 mt-auto bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
       </div>; // return '-' if datas is not an array or is empty
     }
-  let totalARB = 0 
-  if(isLocalhost){
-     totalARB = datas ? datas.reduce((count, item) => {
-      // Check if the item has a SeqNo property
-      if (item['First Name']) {
-        // Increment the count by 1 for each occurrence of SeqNo
-        return count + 1;
-      }
-      return count;
-    }, 0) : '';
-  }else{
-    totalARB = datas[0].totalarb
-  }
+    let totalARB = 0
+    if (isLocalhost) {
+      totalARB = datas ? datas.reduce((count, item) => {
+        // Check if the item has a SeqNo property
+        if (item['First Name']) {
+          // Increment the count by 1 for each occurrence of SeqNo
+          return count + 1;
+        }
+        return count;
+      }, 0) : '';
+    } else {
+      totalARB = datas[0].totalarb
+    }
     return totalARB;
   }
+  const calculateTotalStatistics = async () => {
+    let totalSeqNo = 0;
+    let totalArea = 0;
+    let totalMale = 0;
+    let totalFemale = 0;
+    let totalARB = 0;
+  
+    const dataSources = [northCotData, saranganiData, southCotData, sultanKudaratData];
+  
+    for (const data of dataSources) {
+      if (data) {
+        totalSeqNo += countSequenceNo(data);
+        totalArea += countAreas(data);
+        totalMale += countTotalMales(data);
+        totalFemale += countTotalFemales(data);
+        totalARB += countTotalARBs(data);
+      }
+    }
+    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+      setTotalSeqNo(totalSeqNo)
+      localStorage.setItem('totalSeqNo', totalSeqNo);
+    }
+    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+      setTotalArea(totalArea)
+      localStorage.setItem('totalArea', totalArea);
+    }
+    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+      setTotalMale(totalMale)
+      localStorage.setItem('totalMale', totalMale);
+    }
+    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+      setTotalFemale(totalFemale)
+      localStorage.setItem('totalFemale', totalFemale);
+    }
+    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+      setTotalARB(totalARB)
+      localStorage.setItem('totalARB', totalARB);
+    }
+    // Save the totals in local storage
+  };
+  console.log("localStorageTotalSeqNo: ", localStorageTotalSeqNo)
 
+  useEffect(() => {
 
+    const totalSeqNo = localStorage.getItem('totalSeqNo');
+    const totalArea = localStorage.getItem('totalArea');
+    const totalMale = localStorage.getItem('totalMale');
+    const totalFemale = localStorage.getItem('totalFemale');
+    const totalARB = localStorage.getItem('totalARB');
+
+    setLocalStorageTotalSeqNo(totalSeqNo)
+    setLocalStorageTotalArea(totalArea)
+    setLocalStorageTotalMale(totalMale)
+    setLocalStorageTotalFemale(totalFemale)
+    setLocalStorageTotalARB(totalARB)
+  }, []);
+  
+  useEffect(() => {
+    calculateTotalStatistics();
+    },[northCotData, saranganiData, southCotData, sultanKudaratData]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -611,7 +681,7 @@ export default function ThreeA() {
 
                         //QUERY ONLINE for every newly uploaded do upload in online vercel postgres too
                         const onlineColumns = ['SeqNo', 'Area', 'Male', 'Female', 'TotalARB']
-                        
+
                         let values = [];
                         onlineColumns.forEach(column => {
                           if (column === 'SeqNo') {
@@ -628,16 +698,16 @@ export default function ThreeA() {
                         });
 
                         // If none of the conditions match, values will be an empty array
-                        
+
                         if (currentTab.length > 1) {
                           const sql = `DELETE FROM ess_3a_${activeTab.replace(/-/g, "_")}`;
                           console.log('SQL:', sql);
                           await deleteOldDatasOnline(sql)
-          
+
                         }
 
                         const sqlOnline = `INSERT INTO ess_3a_${activeTab.replace(/-/g, "_")} (${onlineColumns}) VALUES ($1,$2,$3,$4,$5)`;
-                        
+
                         console.log("sqlOnline: ", sqlOnline)
                         console.log("sqlOnline values: ", values)
                         uploadToOnline(sqlOnline, values)
@@ -673,7 +743,7 @@ export default function ThreeA() {
     }
   };
 
-  const gridClassName = isMobile ? 'flex flex-wrap gap-5 text-xs' : 'grid grid-rows-2 grid-flow-col gap-5 mt-10 ml-5 mr-5 justify-items-center';
+  const gridClassName = isMobile ? 'flex flex-wrap gap-5 text-xs' : 'grid grid-rows-2 grid-flow-col gap-5 justify-items-center';
 
   const openFileInput = () => {
     // Click the hidden file input when the div is clicked
@@ -731,278 +801,230 @@ export default function ThreeA() {
     return false;
   }) : '';
 
+  const overviewData = (image, title, data) => (
+    
+    <div className="w-fit flex flex-col gap-3 text-left items-center">
+      <div className="flex flex-col items-center">
+        {image}
+        <label className="font-bold text-navy-primary">{title}</label>
+        {isNaN(data) ? (
+          <div role="status" className="max-w-sm animate-pulse">
+            <div className="h-7 bg-gray-200 rounded-md dark:bg-gray-700 w-14 mb-4"></div>
+          </div>
+        ) : (
+          <label className="font-semibold text-4xl mt-auto">{data ? Number(data).toLocaleString():''}</label>
+        )}
+      </div>
+    </div>
+  );
+  
+  
+  const overviewProvinceData = (image, title, color, data) => {
+    return (
+      <div className='w-fit flex flex-col text-left justify-start items-center'>
+        {image}
+        <label className='font-bold text-navy-primary'>{title}</label>
+        <label className={`font-semibold ${color} text-2xl mt-auto`}>{data}</label>
+      </div>
+    )
+  }
+  console.log("localStorageTotalSeqNo: ", typeof localStorageTotalSeqNo)
   return (
-    <div>
+    <div className={`${isMobile ? '' : 'ml-56 mr-56'}`}>
       <Layout>
+        <div className='flex justify-around gap-16 bg-white rounded-3xl h-52 p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5'>
+          {isMobile ? null : <Image width={180} height={170} src="/images/dar-region12-logo.png" alt='dar region 12 logo' />}
+          <div className='flex flex-row justify-center gap-16 items-center'>
+            {overviewData(<MdFormatListNumbered className='text-7xl' />, 'Seq No:', localStorageTotalSeqNo==undefined? totalSeqNo: localStorageTotalSeqNo)}
+            {overviewData(<MdMap className='text-7xl' />, 'Area:', localStorageTotalArea==undefined? totalArea: localStorageTotalArea)}
+            {overviewData(<MdFace6 className='text-7xl' />, 'Male:', localStorageTotalMale==undefined? totalMale : localStorageTotalMale)}
+            {overviewData(<MdFace3 className='text-7xl' />, 'Female:', localStorageTotalFemale==undefined? totalFemale : localStorageTotalFemale)}
+            {overviewData(<MdGroups2 className='text-7xl' />, 'Total ARBs:', localStorageTotalARB ==undefined? totalARB: localStorageTotalARB)}
+          </div>
+          {isMobile ? null : <h1 className='font-black text-7xl flex items-center'>ESS</h1>}
+        </div>
+
         <div className={gridClassName}>
           {/**NORTH COTABATO */}
-          <div className='grid grid-cols-6 gap-0 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
+          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
             <Image width={100} height={100} src="/images/cotabato.png" alt='DAR North Cotabato Logo' />
-            <div className='w-fit flex flex-col text-left justify-start items-center'>
-              <MdFormatListNumbered className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countSequenceNo(northCotData)}</label>
-            </div>
-
-            <div className='w-fit flex flex-col text-center justify-start items-center'>
-              <MdMap className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countAreas(northCotData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace6 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countTotalMales(northCotData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace3 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-green-700 text-2xl mt-auto'>{countTotalFemales(northCotData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdGroups2 className='text-4xl' />
-              <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-green-700 text-4xl mt-auto'>{countTotalARBs(northCotData)}</label>
-            </div>
-
+            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-green-700', countSequenceNo(northCotData))}
+            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-green-700', countAreas(northCotData))}
+            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-green-700', countTotalMales(northCotData))}
+            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-green-700', countTotalFemales(northCotData))}
+            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-green-700', countTotalARBs(northCotData))}
           </div>
 
           {/**SOUTH COTABATO */}
-          <div className='grid grid-cols-6 gap-0 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
+          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
             <Image width={100} height={100} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' />
-            <div className='w-fit flex flex-col text-left justify-start items-center'>
-              <MdFormatListNumbered className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countSequenceNo(southCotData)}</label>
-            </div>
-
-            <div className='w-fit flex flex-col text-center justify-start items-center'>
-              <MdMap className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countAreas(southCotData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace6 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countTotalMales(southCotData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace3 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-blue-700 text-2xl mt-auto'>{countTotalFemales(southCotData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdGroups2 className='text-4xl' />
-              <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-blue-700 text-4xl mt-auto'>{countTotalARBs(southCotData)}</label>
-            </div>
+            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-blue-700', countSequenceNo(southCotData))}
+            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-blue-700', countAreas(southCotData))}
+            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-blue-700', countTotalMales(southCotData))}
+            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-blue-700', countTotalFemales(southCotData))}
+            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-blue-700', countTotalARBs(southCotData))}
 
           </div>
 
-          <div className='grid grid-cols-6 gap-0 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
+          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
             <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' />
-            <div className='w-fit flex flex-col text-left justify-start items-center'>
-              <MdFormatListNumbered className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countSequenceNo(saranganiData)}</label>
-            </div>
-
-            <div className='w-fit flex flex-col text-center justify-start items-center'>
-              <MdMap className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countAreas(saranganiData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace6 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countTotalMales(saranganiData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace3 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-yellow-600 text-2xl mt-auto'>{countTotalFemales(saranganiData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdGroups2 className='text-4xl' />
-              <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-yellow-600 text-4xl mt-auto'>{countTotalARBs(saranganiData)}</label>
-            </div>
-
+            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-yellow-600', countSequenceNo(saranganiData))}
+            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-yellow-600', countAreas(saranganiData))}
+            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-yellow-600', countTotalMales(saranganiData))}
+            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-yellow-600', countTotalFemales(saranganiData))}
+            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-yellow-600', countTotalARBs(saranganiData))}
           </div>
 
-          <div className='grid grid-cols-6 gap-0 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
+          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
             <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' />
-            <div className='w-fit flex flex-col text-left justify-start items-center'>
-              <MdFormatListNumbered className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Seq No.</label>
-              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countSequenceNo(sultanKudaratData)}</label>
-            </div>
-
-            <div className='w-fit flex flex-col text-center justify-start items-center'>
-              <MdMap className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Area</label>
-              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countAreas(sultanKudaratData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace6 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Male ARB</label>
-              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countTotalMales(sultanKudaratData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdFace3 className='text-5xl' />
-              <label className='font-bold text-navy-primary'>Female ARB</label>
-              <label className='font-semibold text-gray-600 text-2xl mt-auto'>{countTotalFemales(sultanKudaratData)}</label>
-            </div>
-            <div className=' w-fit flex flex-col text-center justify-start items-center'>
-              <MdGroups2 className='text-4xl' />
-              <label className='font-bold text-navy-primary'>Total ARB's</label>
-              <label className='font-black text-gray-600 text-4xl mt-auto'>{countTotalARBs(sultanKudaratData)}</label>
-            </div>
-
+            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-gray-600', countSequenceNo(sultanKudaratData))}
+            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-gray-600', countAreas(sultanKudaratData))}
+            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-gray-600', countTotalMales(sultanKudaratData))}
+            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-gray-600', countTotalFemales(sultanKudaratData))}
+            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-gray-600', countTotalARBs(sultanKudaratData))}
           </div>
         </div>
-        <div className='bg-white rounded-3xl mt-10 ml-5 mr-5 pl-5 pr-5 shadow-md max-w-full'>
-          <div className={`flex justify-between ${isMobile ? 'flex-wrap' : ''}`}>
-            <div className={`flex items-center ${isMobile ? 'flex-wrap' : ''}`}>
-              <div className={`flex  ${isMobile ? 'flex-wrap' : ''}`}>
-                <div className='flex items-center'>
-                  <MdSearch className='absolute mt-4 ml-2 text-2xl' />
-                  <input
-                    className='rounded-3xl h-12 w-auto border-2 mt-4 pl-8 align-middle pr-3'
-                    type='text'
-                    placeholder='Search'
-                    value={searchQuery}
-                    onChange={handlesSearchQuery} />
-                  <MdClose
-                    className='absolute mt-4 ml-48 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
-                    onClick={() => setSearchQuery('')} />
+    
+          <div className='bg-white rounded-3xl mt-10 pl-5 pr-5 shadow-md max-w-full'>
+            <div className={`flex justify-between ${isMobile ? 'flex-wrap' : ''}`}>
+              <div className={`flex items-center ${isMobile ? 'flex-wrap' : ''}`}>
+                <div className={`flex  ${isMobile ? 'flex-wrap' : ''}`}>
+                  <div className='flex items-center'>
+                    <MdSearch className='absolute mt-4 ml-2 text-2xl' />
+                    <input
+                      className='rounded-3xl h-12 w-auto border-2 mt-4 pl-8 align-middle pr-3'
+                      type='text'
+                      placeholder='Search'
+                      value={searchQuery}
+                      onChange={handlesSearchQuery} />
+                    <MdClose
+                      className='absolute mt-4 ml-48 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
+                      onClick={() => setSearchQuery('')} />
 
+                  </div>
+                  <div
+                    className='flex items-center justify-center 
+              rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary
+               text-grey-primary font-semibold shadow-sm cursor-pointer border-1 
+               border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
+                    onClick={isLocalhost ? () => setShowCountBlankModal(true) : () => setShowDisableModal(true)}
+
+                  >Count Blanks
+                  </div>
                 </div>
+
+
+              </div>
+              <div className={`flex items-center gap-5 ${isMobile ? 'flex-wrap' : ''}`}>
+                {selectedFile && uploadingStatus && (
+                  <>
+                    <button className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full' onClick={handleUpload}>Upload</button>
+                    <p className="ml-2 mt-3 text-sm text-green-700">
+                      <b>Selected file:</b> <i>{selectedFile.name}</i>
+                    </p>
+                  </>
+
+                )}
                 <div
-                  className='flex items-center justify-center 
-                rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary
-                 text-grey-primary font-semibold shadow-sm cursor-pointer border-1 
-                 border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
-                  onClick={isLocalhost ? ()=> setShowCountBlankModal(true):()=>setShowDisableModal(true) }
-                 
-                >Count Blanks
+                  className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
+                  onClick={isLocalhost ? openFileInput : () => setShowDisableModal(true)} // Disable the onClick event if isLocalhost is false
+                >
+                  <MdUpload className='text-2xl' />
+                  <label className='cursor-pointer'>
+                    Upload New Data
+                  </label>
+                  <input
+                    ref={inputRef}
+                    type='file'
+                    accept='.csv'
+                    className="hidden"
+                    onChange={handleFileChange}
+                    disabled={!isLocalhost} // Disable the input element if isLocalhost is false
+                  />
                 </div>
               </div>
 
 
             </div>
-            <div className={`flex items-center gap-5 ${isMobile ? 'flex-wrap' : ''}`}>
-              {selectedFile && uploadingStatus && (
-                <>
-                  <button className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full' onClick={handleUpload}>Upload</button>
-                  <p className="ml-2 mt-3 text-sm text-green-700">
-                    <b>Selected file:</b> <i>{selectedFile.name}</i>
-                  </p>
-                </>
 
-              )}
-              <div
-                className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
-                onClick={isLocalhost ? openFileInput : () => setShowDisableModal(true)} // Disable the onClick event if isLocalhost is false
-              >
-                <MdUpload className='text-2xl' />
-                <label className='cursor-pointer'>
-                  Upload New Data
-                </label>
-                <input
-                  ref={inputRef}
-                  type='file'
-                  accept='.csv'
-                  className="hidden"
-                  onChange={handleFileChange}
-                  disabled={!isLocalhost} // Disable the input element if isLocalhost is false
-                />
-              </div>
+            <div className=" my-4 border-t border-navy-primary pb-4">
+
+              <Tab.Group>
+                <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1 mt-4 overflow-x-auto">
+
+                  <Tab
+                    className={({ selected }) =>
+                      classNames(
+                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                        selected
+                          ? 'bg-white shadow'
+                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                      )
+                    }
+                    selected={activeTab === 'north-cotabato'}
+                    onClick={() => handleTabChange('north-cotabato')}
+                  >
+                    North Cotabato
+                  </Tab>
+                  <Tab
+                    className={({ selected }) =>
+                      classNames(
+                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                        selected
+                          ? 'bg-white shadow'
+                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                      )
+                    }
+                    selected={activeTab === 'sarangani'}
+                    onClick={() => handleTabChange('sarangani')}
+                  >
+                    Sarangani
+                  </Tab>
+                  <Tab
+                    className={({ selected }) =>
+                      classNames(
+                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                        selected
+                          ? 'bg-white shadow'
+                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                      )
+                    }
+                    selected={activeTab === 'south-cotabato'}
+                    onClick={() => handleTabChange('south-cotabato')}
+                  >
+                    South Cotabato
+                  </Tab>
+                  <Tab
+                    className={({ selected }) =>
+                      classNames(
+                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                        selected
+                          ? 'bg-white shadow'
+                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                      )
+                    }
+                    selected={activeTab === 'sultan-kudarat'}
+                    onClick={() => handleTabChange('sultan-kudarat')}
+                  >
+                    Sultan Kudarat
+                  </Tab>
+                </Tab.List>
+                <Tab.Panels className="mt-2  ">
+                  <Tab.Panel><Ess3aTable tableData={northCotData ? filteredNorthCotData : []} isMobile={isMobile} /></Tab.Panel>
+                  <Tab.Panel><Ess3aTable tableData={saranganiData ? filteredSaranganiData : []} isMobile={isMobile} /></Tab.Panel>
+                  <Tab.Panel><Ess3aTable tableData={southCotData ? filteredSouthCotData : []} isMobile={isMobile} /></Tab.Panel>
+                  <Tab.Panel><Ess3aTable tableData={sultanKudaratData ? filteredSultanKudaratData : []} isMobile={isMobile} /></Tab.Panel>
+                </Tab.Panels>
+              </Tab.Group>
+
             </div>
 
-
           </div>
-
-          <div className=" my-4 border-t border-navy-primary pb-4">
-
-            <Tab.Group>
-              <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1 mt-4">
-
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                      selected
-                        ? 'bg-white shadow'
-                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                    )
-                  }
-                  selected={activeTab === 'north-cotabato'}
-                  onClick={() => handleTabChange('north-cotabato')}
-                >
-                  North Cotabato
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                      selected
-                        ? 'bg-white shadow'
-                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                    )
-                  }
-                  selected={activeTab === 'sarangani'}
-                  onClick={() => handleTabChange('sarangani')}
-                >
-                  Sarangani
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                      selected
-                        ? 'bg-white shadow'
-                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                    )
-                  }
-                  selected={activeTab === 'south-cotabato'}
-                  onClick={() => handleTabChange('south-cotabato')}
-                >
-                  South Cotabato
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    classNames(
-                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                      selected
-                        ? 'bg-white shadow'
-                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                    )
-                  }
-                  selected={activeTab === 'sultan-kudarat'}
-                  onClick={() => handleTabChange('sultan-kudarat')}
-                >
-                  Sultan Kudarat
-                </Tab>
-
-
-
-              </Tab.List>
-              <Tab.Panels className="mt-2  ">
-                <Tab.Panel><Ess3aTable tableData={northCotData ? filteredNorthCotData : []} isMobile={isMobile} /></Tab.Panel>
-                <Tab.Panel><Ess3aTable tableData={saranganiData ? filteredSaranganiData : []} isMobile={isMobile} /></Tab.Panel>
-                <Tab.Panel><Ess3aTable tableData={southCotData ? filteredSouthCotData : []} isMobile={isMobile} /></Tab.Panel>
-                <Tab.Panel><Ess3aTable tableData={sultanKudaratData ? filteredSultanKudaratData : []} isMobile={isMobile} /></Tab.Panel>
-              </Tab.Panels>
-            </Tab.Group>
-
-          </div>
-
-        </div>
+ 
       </Layout>
       <CountBlankModal
         isOpen={showCountBlankModal}
