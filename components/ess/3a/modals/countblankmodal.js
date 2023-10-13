@@ -54,36 +54,36 @@ export default function CountBlankModal(props) {
         const gender = 'Gender'
 
         //North Cotabato Calculate blank counts
-        const northcotseqnum = props.northCotData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
-        const northcotarea = props.northCotData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
-        const northcotfn = props.northCotData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
-        const northcotmd = props.northCotData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
-        const northcotln = props.northCotData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
-        const northcotgender = props.northCotData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
+        const northcotseqnum = props.ess3AnorthCotData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
+        const northcotarea = props.ess3AnorthCotData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
+        const northcotfn = props.ess3AnorthCotData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
+        const northcotmd = props.ess3AnorthCotData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
+        const northcotln = props.ess3AnorthCotData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
+        const northcotgender = props.ess3AnorthCotData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
 
         //Sarangani Calculate blank counts
-        const saranganiseqnum = props.saranganiData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
-        const saranganiarea = props.saranganiData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
-        const saranganifn = props.saranganiData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
-        const saranganimd = props.saranganiData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
-        const saranganiln = props.saranganiData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
-        const saranganigender = props.saranganiData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
+        const saranganiseqnum = props.ess3AsaranganiData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
+        const saranganiarea = props.ess3AsaranganiData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
+        const saranganifn = props.ess3AsaranganiData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
+        const saranganimd = props.ess3AsaranganiData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
+        const saranganiln = props.ess3AsaranganiData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
+        const saranganigender = props.ess3AsaranganiData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
         
         //South Cotabato Calculate blank counts
-        const southcotseqnum = props.southCotData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
-        const southcotarea = props.southCotData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
-        const southcotfn = props.southCotData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
-        const southcotmd = props.southCotData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
-        const southcotln = props.southCotData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
-        const southcotgender = props.southCotData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
+        const southcotseqnum = props.ess3AsouthCotData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
+        const southcotarea = props.ess3AsouthCotData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
+        const southcotfn = props.ess3AsouthCotData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
+        const southcotmd = props.ess3AsouthCotData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
+        const southcotln = props.ess3AsouthCotData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
+        const southcotgender = props.ess3AsouthCotData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
 
         //Sultan Kudarat Calculate blank counts
-        const sultankudaratseqnum = props.sultanKudaratData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
-        const sultankudaratarea = props.sultanKudaratData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
-        const sultankudaratfn = props.sultanKudaratData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
-        const sultankudaratmd = props.sultanKudaratData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
-        const sultankudaratln = props.sultanKudaratData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
-        const sultankudaratgender = props.sultanKudaratData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
+        const sultankudaratseqnum = props.ess3AsultanKudaratData.filter(obj => obj[seqNum] === '' || obj[seqNum] === null || obj[seqNum] === undefined).length;
+        const sultankudaratarea = props.ess3AsultanKudaratData.filter(obj => obj[area] === '' || obj[area] === null || obj[area] === undefined).length;
+        const sultankudaratfn = props.ess3AsultanKudaratData.filter(obj => obj[fn] === '' || obj[fn] === null || obj[fn] === undefined).length;
+        const sultankudaratmd = props.ess3AsultanKudaratData.filter(obj => obj[mn] === '' || obj[mn] === null || obj[mn] === undefined).length;
+        const sultankudaratln = props.ess3AsultanKudaratData.filter(obj => obj[ln] === '' || obj[ln] === null || obj[ln] === undefined).length;
+        const sultankudaratgender = props.ess3AsultanKudaratData.filter(obj => obj[gender] === '' || obj[gender] === null || obj[gender] === undefined).length;
 
 
 

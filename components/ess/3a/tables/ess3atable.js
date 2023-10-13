@@ -251,7 +251,7 @@ export default function Ess3aTable(props) {
             </tbody>
           </table>
         </div>
-        <div className={`mt-4 flex justify-center gap-5 ${props.isMobile?'flex-wrap':''}`}>
+        <div className={`mt-4 flex justify-center gap-5 ${props.isLaptop?'flex-wrap':''}`}>
           <button
             onClick={startPage}
             disabled={currentPage === 1}

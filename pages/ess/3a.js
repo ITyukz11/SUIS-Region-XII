@@ -1,29 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Layout from '../../components/layout'
-import { MdFace3, MdFace6, MdFormatListNumbered, MdGroups2, MdMap, MdSearch, MdUpload, MdClose } from 'react-icons/md'
-import { Tab } from '@headlessui/react'
+import { MdFace3, MdFace6, MdFormatListNumbered, MdGroups2, MdMap, MdSearch, MdUpload, MdClose, MdThumbUpAlt, MdThumbDownAlt, MdChevronRight, MdChevronLeft } from 'react-icons/md'
+import { Tab, Transition } from '@headlessui/react'
 import Image from 'next/image'
 import csv from 'csv-parser'; // Import the csv-parser library
 import Swal from 'sweetalert2'
 import CountBlankModal from '../../components/ess/3a/modals/countblankmodal'
 import DisableModal from '../../components/ess/3a/modals/disablemodal'
 import Ess3aTable from '../../components/ess/3a/tables/ess3atable'
+import Counter from '../../components/Counter'
+import { useDatas } from '../api/Datas'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function ThreeA() {
-  const [southCotData, setSouthCotData] = useState([]);
-  const [northCotData, setNorthCotData] = useState([]);
-  const [saranganiData, setSaranganiData] = useState([]);
-  const [sultanKudaratData, setSultanKudaratData] = useState([]);
+  const { isLocalhost, localStorageTotalSeqNo, localStorageTotalArea, localStorageTotalMale, localStorageTotalFemale, localStorageTotalARB,
+    localStorageEss3aYesPossession, localStorageEss3aNoPossession,
+    getEss3ADatas, ess3AnorthCotData, ess3AsaranganiData, ess3AsouthCotData, ess3AsultanKudaratData } = useDatas();
 
-  const [localStorageTotalSeqNo, setLocalStorageTotalSeqNo] = useState()
-  const [localStorageTotalArea, setLocalStorageTotalArea] = useState()
-  const [localStorageTotalMale, setLocalStorageTotalMale] = useState()
-  const [localStorageTotalFemale, setLocalStorageTotalFemale] = useState()
-  const [localStorageTotalARB, setLocalStorageTotalARB] = useState()
 
   const [totalSeqNo, setTotalSeqNo] = useState()
   const [totalArea, setTotalArea] = useState()
@@ -32,6 +28,7 @@ export default function ThreeA() {
   const [totalARB, setTotalARB] = useState()
 
   const [isMobile, setIsMobile] = useState(false);
+  const [isLaptop, setIsLaptop] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingStatus, setUploadingStatus] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,6 +36,17 @@ export default function ThreeA() {
   //Modal for counting blanks
   const [showCountBlankModal, setShowCountBlankModal] = useState(false)
   const [showDisableModal, setShowDisableModal] = useState(false)
+
+  //Show Yes ARB possession data
+  const [yesARBPosShow, setYesARBPosShow] = useState(false)
+  //Show No ARB possession data
+  const [noARBPosShow, setNoARBPosShow] = useState(false)
+
+  //ARB Possession data
+  const [southCotARBPosData, setSouthCotARBPosData] = useState([]);
+  const [northCotARBPosData, setNorthCotARBPosData] = useState([]);
+  const [saranganiARBPosData, setSaranganiARBPosData] = useState([]);
+  const [sultanKudaratARBPosData, setSultanKudaratARBPosData] = useState([]);
 
   const inputRef = useRef(null);
 
@@ -54,10 +62,6 @@ export default function ThreeA() {
   //Check if batches are complete uploading
   const [batchUploadStatus, setBatchUploadStatus] = useState(false)
   const [uploadingSuccess, setUploadingSuccess] = useState(false)
-
-  //CHECK IF LOCALHOST OR ONLINE
-  const isLocalhost = process.env.NEXT_PUBLIC_URL.includes('localhost');
-
   // Define a function to handle tab selection
   const handleTabChange = (menu) => {
     setActiveTab(menu); // Update the active tab index when a tab is selected
@@ -65,14 +69,16 @@ export default function ThreeA() {
 
   useEffect(() => {
     // Check if the screen width is less than a certain value (e.g., 768 for mobile devices)
-    const isMobileDevice = window.innerWidth < 1025;
-
+    const isMobileDevice = window.innerWidth < 640;
+    const isLaptopDevice = window.innerWidth < 1492
     setIsMobile(isMobileDevice);
-
+    setIsLaptop(isLaptopDevice)
     // Listen for window resize events to update the state when the screen size changes
     const handleResize = () => {
-      const isMobileDevice = window.innerWidth < 1025;
+      const isMobileDevice = window.innerWidth < 640;
+      const isLaptopDevice = window.innerWidth < 1492
       setIsMobile(isMobileDevice);
+      setIsLaptop(isLaptopDevice)
     };
 
     window.addEventListener('resize', handleResize);
@@ -82,77 +88,6 @@ export default function ThreeA() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  //FOR ONLINE 
-  async function getEss3ADatasTest2() {
-    const postData = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    const provinces = ['test-north-cotabato', 'test-sarangani', 'test-south-cotabato', 'test-sultan-kudarat'];
-
-    provinces.forEach(async (province) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}`, postData);
-      const response = await res.json();
-      if (!response.error) {
-        switch (province) { // Use `province` instead of `provinces[index]`
-          case 'test-north-cotabato':
-            setNorthCotData(response);
-            break;
-          case 'test-sarangani':
-            setSaranganiData(response);
-            break;
-          case 'test-south-cotabato':
-            setSouthCotData(response);
-            break;
-          case 'test-sultan-kudarat':
-            setSultanKudaratData(response);
-            break;
-          default:
-            break;
-        }
-        console.log(`response for ${province}: `, response);
-      }
-    });
-  }
-
-
-
-  async function getEss3ADatas() {
-    const postData = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-
-    provinces.forEach(async (province) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}`, postData);
-      const response = await res.json();
-      if (!response.error) {
-        switch (province) { // Use `province` instead of `provinces[index]`
-          case 'north-cotabato':
-            setNorthCotData(response);
-            break;
-          case 'sarangani':
-            setSaranganiData(response);
-            break;
-          case 'south-cotabato':
-            setSouthCotData(response);
-            break;
-          case 'sultan-kudarat':
-            setSultanKudaratData(response);
-            break;
-          default:
-            break;
-        }
-        console.log(`response for ${province}: `, response);
-      }
-    });
-  }
-
 
 
   async function uploadNewDatas(sql, values) {
@@ -174,7 +109,7 @@ export default function ThreeA() {
         // Handle server error here (e.g., res.status >= 400)
         const errorResponse = await res.json();
         const errorMessage = errorResponse.error || "Server error occurred";
-        console.log("Error MessageZXC: ", errorMessage);
+        console.log("Error Message: ", errorMessage);
         setErrorPostReq(await errorMessage); // Set the error message in state
 
         setErrorActive(true)
@@ -190,7 +125,7 @@ export default function ThreeA() {
 
         setUploadingSuccess(true)
 
-        console.log("help uploadingSuccess:", uploadingSuccess)
+        console.log("uploadingSuccess:", uploadingSuccess)
       } else {
         console.log("Failed", response)
       }
@@ -217,7 +152,7 @@ export default function ThreeA() {
         // Handle server error here (e.g., res.status >= 400)
         const errorResponse = await res.json();
         const errorMessage = errorResponse.error || "Server error occurred";
-        console.log("Error MessageZXC: ", errorMessage);
+        console.log("Error Message: ", errorMessage);
         setErrorPostReq(await errorMessage); // Set the error message in state
 
         setErrorActive(true)
@@ -257,7 +192,7 @@ export default function ThreeA() {
         // Handle server error here (e.g., res.status >= 400)
         const errorResponse = await res.json();
         const errorMessage = errorResponse.error || "Server error occurred";
-        console.log("Error MessageZXC: ", errorMessage);
+        console.log("Error Message: ", errorMessage);
         setErrorPostReq(await errorMessage); // Set the error message in state
 
         setErrorActive(true)
@@ -298,7 +233,7 @@ export default function ThreeA() {
         // Handle server error here (e.g., res.status >= 400)
         const errorResponse = await res.json();
         const errorMessage = errorResponse.error || "Server error occurred";
-        console.log("Error MessageZXC: ", errorMessage);
+        console.log("Error Message: ", errorMessage);
         setErrorPostReq(await errorMessage); // Set the error message in state
 
         setErrorActive(true)
@@ -320,19 +255,11 @@ export default function ThreeA() {
     }
   }
 
-  //FETCH DATAS
-  useEffect(() => {
-    if (isLocalhost) {
-      getEss3ADatas()
-    } else {
-      getEss3ADatasTest2()
-    }
-  }, []);
 
   //Handling Upload Success
   useEffect(() => {
-    console.log("help errorActive:", errorActive)
-    console.log("help uploadingSuccess:", uploadingSuccess)
+    console.log("errorActive:", errorActive)
+    console.log("uploadingSuccess:", uploadingSuccess)
 
     if (batchUploadStatus) {
       if (!errorActive && uploadingSuccess) {
@@ -368,9 +295,6 @@ export default function ThreeA() {
     }
   }, [batchUploadStatus])
 
-
-
-
   //Counting Sequence Number Function
   const countSequenceNo = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
@@ -397,7 +321,6 @@ export default function ThreeA() {
 
     return seqNoCount;
   };
-
 
   // Function to count the occurrences of CLOA AREA
   const countAreas = (datas) => {
@@ -449,7 +372,6 @@ export default function ThreeA() {
     return maleNoCount;
   }
 
-
   const countTotalFemales = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
       return <div role="status" className="max-w-sm animate-pulse">
@@ -485,7 +407,7 @@ export default function ThreeA() {
     if (isLocalhost) {
       totalARB = datas ? datas.reduce((count, item) => {
         // Check if the item has a SeqNo property
-        if (item['First Name']) {
+        if (item['Is the ARB still in possession?']) {
           // Increment the count by 1 for each occurrence of SeqNo
           return count + 1;
         }
@@ -496,15 +418,31 @@ export default function ThreeA() {
     }
     return totalARB;
   }
+
+  const countTotalYesOrNoArbInPos = (datas, possession) => {    
+    let total = 0
+        total += datas ? datas.reduce((count, item) => {
+          //Change to lowercase to match other cases
+          const arbStillInPossession = item['Is the ARB still in possession?'] != null ? item['Is the ARB still in possession?'].toLowerCase() : ''
+          if (arbStillInPossession == possession) {
+            // Increment the count by 1 for each occurrence of SeqNo && yes arb possession
+            return count + 1;
+          }
+          return count;
+        }, 0) : 0;
+    
+    return total; 
+  }
+
   const calculateTotalStatistics = async () => {
     let totalSeqNo = 0;
     let totalArea = 0;
     let totalMale = 0;
     let totalFemale = 0;
     let totalARB = 0;
-  
-    const dataSources = [northCotData, saranganiData, southCotData, sultanKudaratData];
-  
+
+    const dataSources = [ess3AnorthCotData, ess3AsaranganiData, ess3AsouthCotData, ess3AsultanKudaratData];
+
     for (const data of dataSources) {
       if (data) {
         totalSeqNo += countSequenceNo(data);
@@ -514,48 +452,269 @@ export default function ThreeA() {
         totalARB += countTotalARBs(data);
       }
     }
-    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalSeqNo(totalSeqNo)
-      localStorage.setItem('totalSeqNo', totalSeqNo);
+      localStorage.setItem('ess3aTotalSeqNo', totalSeqNo);
     }
-    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalArea(totalArea)
-      localStorage.setItem('totalArea', totalArea);
+      localStorage.setItem('ess3aTotalArea', totalArea);
     }
-    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalMale(totalMale)
-      localStorage.setItem('totalMale', totalMale);
+      localStorage.setItem('ess3aTotalMale', totalMale);
     }
-    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalFemale(totalFemale)
-      localStorage.setItem('totalFemale', totalFemale);
+      localStorage.setItem('ess3aTotalFemale', totalFemale);
     }
-    if(!localStorageTotalSeqNo==undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)){
+    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalARB(totalARB)
-      localStorage.setItem('totalARB', totalARB);
+      localStorage.setItem('ess3aTotalARB', totalARB);
     }
     // Save the totals in local storage
   };
-  console.log("localStorageTotalSeqNo: ", localStorageTotalSeqNo)
 
-  useEffect(() => {
-
-    const totalSeqNo = localStorage.getItem('totalSeqNo');
-    const totalArea = localStorage.getItem('totalArea');
-    const totalMale = localStorage.getItem('totalMale');
-    const totalFemale = localStorage.getItem('totalFemale');
-    const totalARB = localStorage.getItem('totalARB');
-
-    setLocalStorageTotalSeqNo(totalSeqNo)
-    setLocalStorageTotalArea(totalArea)
-    setLocalStorageTotalMale(totalMale)
-    setLocalStorageTotalFemale(totalFemale)
-    setLocalStorageTotalARB(totalARB)
-  }, []);
+  const overviewData = (image, title, data) => {
+    const styledImage = React.cloneElement(image, {
+      className: 'sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl',
+    });
+    return (
+      <div className="w-fit flex flex-col gap-3 text-left items-center">
+        <div className="flex flex-col items-center">
+          {styledImage}
+          <label className="font-bold text-navy-primary">{title}</label>
+          {isNaN(data) ? (
+            <div role="status" className="max-w-sm animate-pulse">
+              <div className="h-7 bg-gray-200 rounded-md dark:bg-gray-700 w-14 mb-4"></div>
+            </div>
+          ) : (
+            <label className="font-semibold mt-auto  sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl">{data ? Number(data).toLocaleString() : ''}</label>
+          )}
+        </div>
+      </div>
+    )
+  };
+  const overviewProvinceData = (image, title, color, data) => {
+    const styledImage = React.cloneElement(image, {
+      className: 'sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl',
+    });
+    return (
+      <div className='w-fit flex flex-col text-left justify-start items-center cursor-pointer'>
+        {styledImage}
+        <label className='font-bold text-navy-primary cursor-pointer'>{title}</label>
+        <label className={`font-semibold ${color} mt-auto sm:text-sm md:text-base lg:text-base xl:text-lg 2xl:text-xl cursor-pointer`}>{data}</label>
+      </div>
+    )
+  }
+  //Function to count all ARB still in possession
+  const countProvincesArbPossession = (possession) => {
+      const datas = [ess3AnorthCotData ? ess3AnorthCotData : 0, ess3AsaranganiData ? ess3AsaranganiData : 0, ess3AsouthCotData ? ess3AsouthCotData : 0, ess3AsultanKudaratData ? ess3AsultanKudaratData : 0]
+    
+      if (!Array.isArray(datas) || datas.length === 0) {
+        return <div role="status" className="max-w-sm animate-pulse">
+          <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+        </div>; // return '-' if datas is not an array or is empty
+      }
   
+      let total = 0
+      datas.forEach(data => {
+        if (isLocalhost) {
+          total += data ? data.reduce((count, item) => {
+            //Change to lowercase to match other cases
+            const arbStillInPossession = item['Is the ARB still in possession?'] != null ? item['Is the ARB still in possession?'].toLowerCase() : ''
+            if (arbStillInPossession == possession) {
+              // Increment the count by 1 for each occurrence of SeqNo && yes arb possession
+              return count + 1;
+            }
+            return count;
+          }, 0) : 0;
+        } else {
+          if (possession == 'yes') {
+            total += data[0] ? data[0].yes_arb_in_possession : 0
+          } else {
+            total += data[0] ? data[0].no_arb_in_possession : 0
+          }
+        }
+  
+      });
+  
+      try {
+        
+          if(localStorageEss3aYesPossession != total  && possession == 'yes'){
+            localStorage.setItem('ess3aYesArbInPossession', total);
+            
+          }
+      
+          if(localStorageEss3aNoPossession != total  && possession == 'no'){
+            localStorage.setItem('ess3aNoArbInPossession', total)
+            
+          }
+        
+      } catch (e) {
+        console.error("Error accessing localStorage: " + e);
+      }
+      return total;
+    
+  }
+  //Function to count Seq No with YES ARB Possession
+  const countARBPosSeqNo = (datas, possession) => {
+    if (!Array.isArray(datas) || datas.length === 0) {
+      return <div role="status" className="max-w-sm animate-pulse" >
+        <div className="h-4 bg-gray-200 rounded-md dark:bg-gray-700 w-8 mb-4"></div>
+      </div>;
+    }
+
+    let total = 0
+    if (isLocalhost) {
+      total = datas.reduce((count, item) => {
+        const CLOASeqNo = item['Collective CLOA Sequence Number']
+        const arbStillInPossession = item['Is the ARB still in possession?'] != null ? item['Is the ARB still in possession?'].toLowerCase() : ''
+        // Check if the item has a SeqNo property
+        if (CLOASeqNo && arbStillInPossession == possession) {
+          // Increment the count by 1 for each occurrence of SeqNo
+          return count + 1;
+        }
+        return count;
+      }, 0);
+    } else {
+      if(possession=='yes'){
+        total = datas[0].seqno_yes_arb_in_possession
+      }else{
+        total = datas[0].seqno_no_arb_in_possession
+      }
+    }
+
+
+    return total;
+  };
+  //Function to count Area with YES ARB Possession
+  const countARBPosAreas = (datas, possession) => {
+    if (!Array.isArray(datas) || datas.length === 0) {
+      return <div role="status" className="max-w-sm animate-pulse">
+        <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+      </div>; // return '-' if datas is not an array or is empty
+    }
+    let total = 0
+    if (isLocalhost) {
+      total = datas ? datas.reduce((count, item) => {
+        // Check if the item has CLOA AREA data
+
+        const area = item['Actual area of tillage/cultivation (in square meters)']
+        const arbStillInPossession = item['Is the ARB still in possession?'] != null ? item['Is the ARB still in possession?'].toLowerCase() : ''
+        if (area && area != 0 && arbStillInPossession == possession) {
+          // Increment the count by 1 for each occurrence of CLOA AREA
+          return count + 1;
+        }
+        return count;
+      }, 0) : '';
+    } else {
+      if(possession=='yes'){
+        total = datas[0].area_yes_arb_in_possession
+      }else{
+        total = datas[0].area_no_arb_in_possession
+      }
+    }
+    return total;
+  };
+  //Function to count Males with YES ARB Possession
+  const countARBPosMales = (datas, possession) => {
+    if (!Array.isArray(datas) || datas.length === 0) {
+      return <div role="status" className="max-w-sm animate-pulse">
+        <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+      </div>; // return '-' if datas is not an array or is empty
+    }
+    let total = 0
+    if (isLocalhost) {
+      total = datas ? datas.reduce((count, item) => {
+        // Check if the item has a SeqNo property
+
+        //Change to lowercase to match other cases
+        const gender = item.Gender != null ? item.Gender.toLowerCase() : ''
+        const arbStillInPossession = item['Is the ARB still in possession?'] != null ? item['Is the ARB still in possession?'].toLowerCase() : ''
+        if (gender == "male" && arbStillInPossession == possession) {
+          // Increment the count by 1 for each occurrence of SeqNo
+          return count + 1;
+        }
+        return count;
+      }, 0) : '';
+    } else {
+      if(possession=='yes'){
+        total = datas[0].male_yes_arb_in_possession
+      }else{
+        total = datas[0].male_no_arb_in_possession
+      }
+    }
+
+
+    return total;
+  }
+  //Function to count Females with YES ARB Possession
+  const countARBPosFemales = (datas, possession) => {
+    if (!Array.isArray(datas) || datas.length === 0) {
+      return <div role="status" className="max-w-sm animate-pulse">
+        <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+      </div>; // return '-' if datas is not an array or is empty
+    }
+    let total = 0
+    if (isLocalhost) {
+      total = datas ? datas.reduce((count, item) => {
+        // Check if the item has a SeqNo property
+
+        //Change to lowercase to match other cases
+        const gender = item.Gender != null ? item.Gender.toLowerCase() : ''
+        const arbStillInPossession = item['Is the ARB still in possession?'] != null ? item['Is the ARB still in possession?'].toLowerCase() : ''
+        if (gender == "female" && arbStillInPossession == possession) {
+          // Increment the count by 1 for each occurrence of SeqNo
+          return count + 1;
+        }
+        return count;
+      }, 0) : '';
+    } else {
+      if(possession=='yes'){
+        total = datas[0].female_yes_arb_in_possession
+      }else{
+        total = datas[0].female_no_arb_in_possession
+      }
+    }
+
+
+    return total;
+  }
+  //Function to count Total ARBs with YES ARB Possession
+  const countARBPosTotalARBs = (datas, possession) => {
+    if (!Array.isArray(datas) || datas.length === 0) {
+      return <div role="status" className="max-w-sm animate-pulse">
+        <div className="h-4 mt-2 bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+      </div>; // return '-' if datas is not an array or is empty
+    }
+
+    let total = 0
+    if(isLocalhost){
+      total += datas ? datas.reduce((count, item) => {
+        //Change to lowercase to match other cases
+        const arbStillInPossession = item['Is the ARB still in possession?'] != null ? item['Is the ARB still in possession?'].toLowerCase() : ''
+        if (arbStillInPossession == possession) {
+          // Increment the count by 1 for each occurrence of SeqNo
+          return count + 1;
+        }
+        return count;
+      }, 0) : '';
+    }else{
+      if(possession=='yes'){
+        total = datas[0].totalarb_yes_arb_in_possession
+      }else{
+        total = datas[0].totalarb_no_arb_in_possession
+      }
+    }
+
+
+
+    return total;
+  }
   useEffect(() => {
     calculateTotalStatistics();
-    },[northCotData, saranganiData, southCotData, sultanKudaratData]);
+  }, [ess3AnorthCotData, ess3AsaranganiData, ess3AsouthCotData, ess3AsultanKudaratData]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -610,10 +769,10 @@ export default function ThreeA() {
                     'Middle Name': rowDataArray[14],
                     'Last Name': rowDataArray[15],
                     'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
+                    'Is the ARB still in possession?': rowDataArray[18],
                     'Gender': rowDataArray[23],
                     'Educational Attainment': rowDataArray[46],
                     'Civil Status': rowDataArray[47],
-
                   };
                   datas.push(selectedData);
                 })
@@ -636,7 +795,7 @@ export default function ThreeA() {
               let parameterIndex = 1; // Initialize the parameter index
 
               // Loop through batches and insert data
-              let currentTab = activeTab == 'north-cotabato' ? northCotData : activeTab == "sarangani" ? saranganiData : activeTab == "south-cotabato" ? southCotData : activeTab == "sultan-kudarat" ? sultanKudaratData : ''
+              let currentTab = activeTab == 'north-cotabato' ? ess3AnorthCotData : activeTab == "sarangani" ? ess3AsaranganiData : activeTab == "south-cotabato" ? ess3AsouthCotData : activeTab == "sultan-kudarat" ? ess3AsultanKudaratData : ''
 
               if (currentTab.length > 1) {
                 const sql = `DELETE FROM suis.ess_3a_${activeTab.replace(/-/g, "_")}`;
@@ -666,6 +825,7 @@ export default function ThreeA() {
                 console.log('values: ', values)
                 console.log('Batch Size:', batch.length);
 
+
                 // Execute the SQL query with your database connection here
                 await uploadNewDatas(sql, values)
                   .then(async () => {
@@ -680,10 +840,32 @@ export default function ThreeA() {
                       await getEss3ADatas().then(async () => {
 
                         //QUERY ONLINE for every newly uploaded do upload in online vercel postgres too
-                        const onlineColumns = ['SeqNo', 'Area', 'Male', 'Female', 'TotalARB']
+                        const onlineColumns = [
+                        'SeqNo', //0
+                        'Area', //1
+                        'Male', //2
+                        'Female', //3
+                        'TotalARB',//4
+
+                        'Yes_arb_in_possession',//5
+                        'No_arb_in_possession',//6
+
+                        'SeqNo_yes_arb_in_possession ',//7
+                        'Area_yes_arb_in_possession',//8
+                        'Male_yes_arb_in_possession',//9
+                        'Female_yes_arb_in_possession',//10
+                        'TotalARB_yes_arb_in_possession',//11
+
+                        'SeqNo_no_arb_in_possession ',//12
+                        'Area_no_arb_in_possession',//13
+                        'Male_no_arb_in_possession',//14
+                        'Female_no_arb_in_possession',//15
+                        'TotalARB_no_arb_in_possession'//16
+                      ]
 
                         let values = [];
                         onlineColumns.forEach(column => {
+                          console.log('Processing column:', column);
                           if (column === 'SeqNo') {
                             values.push(countSequenceNo(datas).toString());
                           } else if (column === 'Area') {
@@ -694,6 +876,33 @@ export default function ThreeA() {
                             values.push(countTotalFemales(datas).toString());
                           } else if (column === 'TotalARB') {
                             values.push(countTotalARBs(datas).toString());
+
+                          } else if (column ==='Yes_arb_in_possession'){
+                            values.push(countTotalYesOrNoArbInPos(datas,'yes').toString());  
+                          } else if (column ==='No_arb_in_possession'){
+                            values.push(countTotalYesOrNoArbInPos(datas,'no').toString());
+
+                          } else if (column === 'SeqNo_yes_arb_in_possession ') {
+                            values.push(countARBPosSeqNo(datas,'yes').toString());
+                          } else if (column === 'Area_yes_arb_in_possession') {
+                            values.push(countARBPosAreas(datas,'yes').toString());
+                          } else if (column === 'Male_yes_arb_in_possession') {
+                            values.push(countARBPosMales(datas,'yes').toString());
+                          } else if (column === 'Female_yes_arb_in_possession') {
+                            values.push(countARBPosFemales(datas,'yes').toString());
+                          } else if (column === 'TotalARB_yes_arb_in_possession') {
+                            values.push(countTotalYesOrNoArbInPos(datas,'yes').toString());
+                           
+                          } else if (column === 'SeqNo_no_arb_in_possession ') {
+                            values.push(countARBPosSeqNo(datas,'no').toString());
+                          } else if (column === 'Area_no_arb_in_possession') {
+                            values.push(countARBPosAreas(datas,'no').toString());
+                          } else if (column === 'Male_no_arb_in_possession') {
+                            values.push(countARBPosMales(datas,'no').toString());
+                          } else if (column === 'Female_no_arb_in_possession') {
+                            values.push(countARBPosFemales(datas,'no').toString());
+                          } else if (column === 'TotalARB_no_arb_in_possession') {
+                            values.push(countTotalYesOrNoArbInPos(datas,'no'));
                           }
                         });
 
@@ -705,8 +914,9 @@ export default function ThreeA() {
                           await deleteOldDatasOnline(sql)
 
                         }
-
-                        const sqlOnline = `INSERT INTO ess_3a_${activeTab.replace(/-/g, "_")} (${onlineColumns}) VALUES ($1,$2,$3,$4,$5)`;
+                        let valuesColumnIndex = 1
+                        const valuesColumn = onlineColumns.map(() => `$${valuesColumnIndex++}`).join(', ')
+                        const sqlOnline = `INSERT INTO ess_3a_${activeTab.replace(/-/g, "_")} (${onlineColumns}) VALUES (${valuesColumn})`;
 
                         console.log("sqlOnline: ", sqlOnline)
                         console.log("sqlOnline values: ", values)
@@ -731,9 +941,6 @@ export default function ThreeA() {
                     });
                   });
 
-
-
-
               }
             };
             reader.readAsText(selectedFile); // Read the file as text
@@ -743,7 +950,7 @@ export default function ThreeA() {
     }
   };
 
-  const gridClassName = isMobile ? 'flex flex-wrap gap-5 text-xs' : 'grid grid-rows-2 grid-flow-col gap-5 justify-items-center';
+  const gridClassName = isLaptop ? 'flex flex-wrap gap-5 text-xs' : 'grid grid-rows-2 grid-flow-col gap-5 justify-items-center';
 
   const openFileInput = () => {
     // Click the hidden file input when the div is clicked
@@ -755,7 +962,40 @@ export default function ThreeA() {
   const handlesSearchQuery = (e) => {
     setSearchQuery(e.target.value)
   };
-  const filteredNorthCotData = northCotData ? northCotData.filter((item) => {
+  const filteredNorthCotData = ess3AnorthCotData ? ess3AnorthCotData.filter((item) => {
+    const values = Object.values(item);
+    for (let i = 0; i < values.length; i++) {
+      const value = values[i];
+      if (typeof value === "string" && value.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  }) : '';
+
+  const filteredSaranganiData = ess3AsaranganiData ? ess3AsaranganiData.filter((item) => {
+    const values = Object.values(item);
+    for (let i = 0; i < values.length; i++) {
+      const value = values[i];
+      if (typeof value === "string" && value.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  }) : '';
+
+  const filteredSouthCotData = ess3AsouthCotData ? ess3AsouthCotData.filter((item) => {
+    const values = Object.values(item);
+    for (let i = 0; i < values.length; i++) {
+      const value = values[i];
+      if (typeof value === "string" && value.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  }) : '';
+
+  const filteredSultanKudaratData = ess3AsultanKudaratData ? ess3AsultanKudaratData.filter((item) => {
     const values = Object.values(item);
     for (let i = 0; i < values.length; i++) {
       const value = values[i];
@@ -767,272 +1007,412 @@ export default function ThreeA() {
   }) : '';
 
 
-  const filteredSaranganiData = saranganiData ? saranganiData.filter((item) => {
-    const values = Object.values(item);
-    for (let i = 0; i < values.length; i++) {
-      const value = values[i];
-      if (typeof value === "string" && value.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return true;
+
+  const handlesShowARBposDatas = (possession) => {
+    const datas = [
+      ess3AnorthCotData ? ess3AnorthCotData : [],
+      ess3AsaranganiData ? ess3AsaranganiData : [],
+      ess3AsouthCotData ? ess3AsouthCotData : [],
+      ess3AsultanKudaratData ? ess3AsultanKudaratData : [],
+    ];
+
+    if (yesARBPosShow || noARBPosShow) {
+      for (let index = 0; index < datas.length; index++) {
+        const province = datas[index];
+
+        // Filter the data for 'yes' or 'no' value
+        const ARBPossessionData = province.filter((data) => data['Is the ARB still in possession?'] ? data['Is the ARB still in possession?'].toLowerCase() == possession : []
+        );
+
+      
+        switch (index) {
+          case 0:
+            setNorthCotARBPosData(ARBPossessionData);
+            break;
+          case 1:
+            setSaranganiARBPosData(ARBPossessionData);
+            break;
+          case 2:
+            setSouthCotARBPosData(ARBPossessionData);
+            break;
+          case 3:
+            setSultanKudaratARBPosData(ARBPossessionData);
+            break;
+          default:
+            break;
+        }
       }
     }
-    return false;
-  }) : '';
 
-
-  const filteredSouthCotData = southCotData ? southCotData.filter((item) => {
-    const values = Object.values(item);
-    for (let i = 0; i < values.length; i++) {
-      const value = values[i];
-      if (typeof value === "string" && value.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return true;
-      }
+    if (possession == 'yes') {
+      setYesARBPosShow(!yesARBPosShow);
+      setNoARBPosShow(false);
+    } else {
+      setYesARBPosShow(false);
+      setNoARBPosShow(!noARBPosShow);
     }
-    return false;
-  }) : '';
+  };
 
-  const filteredSultanKudaratData = sultanKudaratData ? sultanKudaratData.filter((item) => {
-    const values = Object.values(item);
-    for (let i = 0; i < values.length; i++) {
-      const value = values[i];
-      if (typeof value === "string" && value.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return true;
-      }
-    }
-    return false;
-  }) : '';
-
-  const overviewData = (image, title, data) => (
-    
-    <div className="w-fit flex flex-col gap-3 text-left items-center">
-      <div className="flex flex-col items-center">
-        {image}
-        <label className="font-bold text-navy-primary">{title}</label>
-        {isNaN(data) ? (
-          <div role="status" className="max-w-sm animate-pulse">
-            <div className="h-7 bg-gray-200 rounded-md dark:bg-gray-700 w-14 mb-4"></div>
-          </div>
-        ) : (
-          <label className="font-semibold text-4xl mt-auto">{data ? Number(data).toLocaleString():''}</label>
-        )}
-      </div>
-    </div>
-  );
-  
-  
-  const overviewProvinceData = (image, title, color, data) => {
-    return (
-      <div className='w-fit flex flex-col text-left justify-start items-center'>
-        {image}
-        <label className='font-bold text-navy-primary'>{title}</label>
-        <label className={`font-semibold ${color} text-2xl mt-auto`}>{data}</label>
-      </div>
-    )
-  }
-  console.log("localStorageTotalSeqNo: ", typeof localStorageTotalSeqNo)
+  const imgClassName = `${isMobile ? 'w-[50px] h-[50px]' : 'w-[100px] h-[100px]'} sm:w-[50px] md:w-[70px] lg:w-[80px] xl:w-[90px] 2xl:w-[100px] sm:h-[50px] md:h-[70px] lg:h-[80px] xl:h-[90px] 2xl:h-[100px]`
+  const containerChildClassName = 'flex justify-around gap-2 bg-white rounded-3xl h-fit w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'
   return (
-    <div className={`${isMobile ? '' : 'ml-56 mr-56'}`}>
+    <div className={`${isMobile ? 'ml-5 mr-5' : isLaptop ? 'ml-40 mr-40' : 'ml-56 mr-56'}`}>
       <Layout>
-        <div className='flex justify-around gap-16 bg-white rounded-3xl h-52 p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5'>
-          {isMobile ? null : <Image width={180} height={170} src="/images/dar-region12-logo.png" alt='dar region 12 logo' />}
-          <div className='flex flex-row justify-center gap-16 items-center'>
-            {overviewData(<MdFormatListNumbered className='text-7xl' />, 'Seq No:', localStorageTotalSeqNo==undefined? totalSeqNo: localStorageTotalSeqNo)}
-            {overviewData(<MdMap className='text-7xl' />, 'Area:', localStorageTotalArea==undefined? totalArea: localStorageTotalArea)}
-            {overviewData(<MdFace6 className='text-7xl' />, 'Male:', localStorageTotalMale==undefined? totalMale : localStorageTotalMale)}
-            {overviewData(<MdFace3 className='text-7xl' />, 'Female:', localStorageTotalFemale==undefined? totalFemale : localStorageTotalFemale)}
-            {overviewData(<MdGroups2 className='text-7xl' />, 'Total ARBs:', localStorageTotalARB ==undefined? totalARB: localStorageTotalARB)}
+        {/**Overall Overview of Provincial Datas CONTAINER */}
+        <div className='flex justify-center gap-9 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 items-center'>
+          {/* <Image width={180} height={170} src="/images/dar-region12-logo.png" alt='dar region 12 logo' /> */}
+          <img className={`${isMobile ? 'w-[80px] h-[80px]' : 'w-[170px] h-[170px]'} sm:w-[70px] md:w-[80px] lg:w-[100px] xl:w-[120px] 2xl:w-[140px] sm:h-[70px] md:h-[80px] lg:h-[100px] xl:h-[120px] 2xl:h-[140px] `} src="/images/dar-region12-logo.png" alt='dar region 12 logo' />
+          <div className='flex flex-row justify-center gap-9 md:gap-9 xl:gap-12 2xl:gap-16 items-center'>
+            {overviewData(<MdMap />, 'Area:', localStorageTotalArea == undefined ? totalArea : localStorageTotalArea)}
+            {overviewData(<MdFace6 />, 'Male:', localStorageTotalMale == undefined ? totalMale : localStorageTotalMale)}
+            {overviewData(<MdFace3 />, 'Female:', localStorageTotalFemale == undefined ? totalFemale : localStorageTotalFemale)}
+            {overviewData(<MdGroups2 />, 'ARBs:', localStorageTotalARB == undefined ? totalARB : localStorageTotalARB)}
           </div>
-          {isMobile ? null : <h1 className='font-black text-7xl flex items-center'>ESS</h1>}
+          {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl'>ESS</label>}
         </div>
-
+        {/**Provincial Datas Overview CONTAINER */}
         <div className={gridClassName}>
           {/**NORTH COTABATO */}
-          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
-            <Image width={100} height={100} src="/images/cotabato.png" alt='DAR North Cotabato Logo' />
-            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-green-700', countSequenceNo(northCotData))}
-            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-green-700', countAreas(northCotData))}
-            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-green-700', countTotalMales(northCotData))}
-            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-green-700', countTotalFemales(northCotData))}
-            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-green-700', countTotalARBs(northCotData))}
+          <div className={containerChildClassName}>
+            <img className={imgClassName} src="/images/cotabato.png" alt='dar region 12 logo' />
+            {/* <Image width={100} height={100} src="/images/cotabato.png" alt='DAR North Cotabato Logo' /> */}
+            {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countSequenceNo(ess3AnorthCotData))}
+            {overviewProvinceData(<MdMap />, 'Area', 'text-green-700', countAreas(ess3AnorthCotData))}
+            {overviewProvinceData(<MdFace6 />, 'Male', 'text-green-700', countTotalMales(ess3AnorthCotData))}
+            {overviewProvinceData(<MdFace3 />, 'Female', 'text-green-700', countTotalFemales(ess3AnorthCotData))}
+            {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countTotalARBs(ess3AnorthCotData))}
           </div>
 
           {/**SOUTH COTABATO */}
-          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
-            <Image width={100} height={100} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' />
-            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-blue-700', countSequenceNo(southCotData))}
-            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-blue-700', countAreas(southCotData))}
-            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-blue-700', countTotalMales(southCotData))}
-            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-blue-700', countTotalFemales(southCotData))}
-            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-blue-700', countTotalARBs(southCotData))}
-
+          <div className={containerChildClassName}>
+            <img className={imgClassName} src="/images/south-cotabato.png" alt='dar region 12 logo' />
+            {/* <Image width={120} height={20} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' /> */}
+            {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-blue-700', countSequenceNo(ess3AsouthCotData))}
+            {overviewProvinceData(<MdMap />, 'Area', 'text-blue-700', countAreas(ess3AsouthCotData))}
+            {overviewProvinceData(<MdFace6 />, 'Male', 'text-blue-700', countTotalMales(ess3AsouthCotData))}
+            {overviewProvinceData(<MdFace3 />, 'Female', 'text-blue-700', countTotalFemales(ess3AsouthCotData))}
+            {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-blue-700', countTotalARBs(ess3AsouthCotData))}
           </div>
-
-          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
-            <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' />
-            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-yellow-600', countSequenceNo(saranganiData))}
-            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-yellow-600', countAreas(saranganiData))}
-            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-yellow-600', countTotalMales(saranganiData))}
-            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-yellow-600', countTotalFemales(saranganiData))}
-            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-yellow-600', countTotalARBs(saranganiData))}
+          {/**SARANGANI */}
+          <div className={containerChildClassName}>
+            <img className={imgClassName} src="/images/sarangani.png" alt='dar region 12 logo' />
+            {/* <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' /> */}
+            {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-yellow-600', countSequenceNo(ess3AsaranganiData))}
+            {overviewProvinceData(<MdMap />, 'Area', 'text-yellow-600', countAreas(ess3AsaranganiData))}
+            {overviewProvinceData(<MdFace6 />, 'Male', 'text-yellow-600', countTotalMales(ess3AsaranganiData))}
+            {overviewProvinceData(<MdFace3 />, 'Female', 'text-yellow-600', countTotalFemales(ess3AsaranganiData))}
+            {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-yellow-600', countTotalARBs(ess3AsaranganiData))}
           </div>
-
-          <div className='flex justify-between gap-10 bg-white rounded-3xl h-32 w-full p-4 shadow-md overflow-x-auto overflow-y-hidden'>
-            <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' />
-            {overviewProvinceData(<MdFormatListNumbered className='text-5xl' />, 'SeqNo.', 'text-gray-600', countSequenceNo(sultanKudaratData))}
-            {overviewProvinceData(<MdMap className='text-5xl' />, 'Area', 'text-gray-600', countAreas(sultanKudaratData))}
-            {overviewProvinceData(<MdFace6 className='text-5xl' />, 'Male', 'text-gray-600', countTotalMales(sultanKudaratData))}
-            {overviewProvinceData(<MdFace3 className='text-5xl' />, 'Female', 'text-gray-600', countTotalFemales(sultanKudaratData))}
-            {overviewProvinceData(<MdGroups2 className='text-5xl' />, 'ARBs', 'text-gray-600', countTotalARBs(sultanKudaratData))}
+          {/**SULTAN KUDARAT */}
+          <div className={containerChildClassName}>
+            <img className={imgClassName} src="/images/sultan-kudarat.png" alt='dar region 12 logo' />
+            {/* <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' /> */}
+            {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-gray-600', countSequenceNo(ess3AsultanKudaratData))}
+            {overviewProvinceData(<MdMap />, 'Area', 'text-gray-600', countAreas(ess3AsultanKudaratData))}
+            {overviewProvinceData(<MdFace6 />, 'Male', 'text-gray-600', countTotalMales(ess3AsultanKudaratData))}
+            {overviewProvinceData(<MdFace3 />, 'Female', 'text-gray-600', countTotalFemales(ess3AsultanKudaratData))}
+            {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-gray-600', countTotalARBs(ess3AsultanKudaratData))}
           </div>
         </div>
-    
-          <div className='bg-white rounded-3xl mt-10 pl-5 pr-5 shadow-md max-w-full'>
-            <div className={`flex justify-between ${isMobile ? 'flex-wrap' : ''}`}>
-              <div className={`flex items-center ${isMobile ? 'flex-wrap' : ''}`}>
-                <div className={`flex  ${isMobile ? 'flex-wrap' : ''}`}>
-                  <div className='flex items-center'>
-                    <MdSearch className='absolute mt-4 ml-2 text-2xl' />
-                    <input
-                      className='rounded-3xl h-12 w-auto border-2 mt-4 pl-8 align-middle pr-3'
-                      type='text'
-                      placeholder='Search'
-                      value={searchQuery}
-                      onChange={handlesSearchQuery} />
-                    <MdClose
-                      className='absolute mt-4 ml-48 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
-                      onClick={() => setSearchQuery('')} />
+        {/**Is the ARB still in possession? CONTAINER */}
+        <div className='flex justify-around bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 mt-5'>
+          <div className='flex flex-row justify-between items-center cursor-pointer hover:bg-grey-primary rounded-full p-5 duration-200' onClick={() => handlesShowARBposDatas('yes')}>
+            <MdThumbUpAlt className={`${isMobile ? 'text-5xl' : 'text-7xl'} text-green-600 cursor-pointer`} />
+            <label className='font-bold text-3xl cursor-pointer'>{<Counter totalNumber={countProvincesArbPossession('yes')} />}</label>
+            <MdChevronRight className={`${isMobile ? 'text-4xl' : 'text-6xl'} text-green-600 ${yesARBPosShow
+              ? 'transform rotate-90 transition-transform duration-200 delay-100'
+              : ' transform rotate-0 transition-transform duration-200 delay-100'}`} />
+          </div>
+          <div className='flex flex-row justify-between items-center'>
+            <label className={`${isMobile ? 'text-base' : 'text-3xl'} font-bold lg:text-3xl md:text-xl sm:text-lg align-middle`}>Is the ARB still in possession?</label>
+          </div>
+          <div className='flex flex-row justify-center items-center cursor-pointer hover:bg-grey-primary rounded-full p-5 duration-200' onClick={() => handlesShowARBposDatas('no')}>
+            <MdChevronLeft className={`${isMobile ? 'text-4xl' : 'text-6xl'} text-red-500  ${noARBPosShow
+              ? 'transform -rotate-90 transition-transform duration-200 delay-100'
+              : ' transform rotate-0 transition-transform duration-200 delay-100'}`} />
+            <label className='font-bold text-3xl cursor-pointer'>{<Counter totalNumber={countProvincesArbPossession('no')} />}</label>
+            <MdThumbDownAlt className={`${isMobile ? 'text-5xl' : 'text-7xl'} text-red-500 cursor-pointer`} />
+          </div>
+        </div>
+        {/**YES ARB POSSESSION */}
+        <Transition
+          show={yesARBPosShow}
+          enter="transition-opacity duration-150"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition-opacity duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className={gridClassName}>
+            {/**NORTH COTABATO */}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/cotabato.png" alt='DAR North Cotabato Logo' />
+              {/* <Image width={100} height={100} src="/images/cotabato.png" alt='DAR North Cotabato Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AnorthCotData, 'yes'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-green-700', countARBPosAreas(ess3AnorthCotData, 'yes'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-green-700', countARBPosMales(ess3AnorthCotData, 'yes'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-green-700', countARBPosFemales(ess3AnorthCotData, 'yes'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countARBPosTotalARBs(ess3AnorthCotData, 'yes'))}
+            </div>
+            {/**SOUTH COTABATO */}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' />
+              {/* <Image width={100} height={100} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AsouthCotData, 'yes'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-green-700', countARBPosAreas(ess3AsouthCotData, 'yes'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-green-700', countARBPosMales(ess3AsouthCotData, 'yes'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-green-700', countARBPosFemales(ess3AsouthCotData, 'yes'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countARBPosTotalARBs(ess3AsouthCotData, 'yes'))}
+            </div>
+            {/**SARANGNI */}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/sarangani.png" alt='DAR sarangani Logo' />
+              {/* <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AsaranganiData, 'yes'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-green-700', countARBPosAreas(ess3AsaranganiData, 'yes'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-green-700', countARBPosMales(ess3AsaranganiData, 'yes'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-green-700', countARBPosFemales(ess3AsaranganiData, 'yes'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countARBPosTotalARBs(ess3AsaranganiData, 'yes'))}
+            </div>
+            {/**SULTAN KUDARAT*/}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' />
+              {/* <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AsultanKudaratData, 'yes'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-green-700', countARBPosAreas(ess3AsultanKudaratData, 'yes'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-green-700', countARBPosMales(ess3AsultanKudaratData, 'yes'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-green-700', countARBPosFemales(ess3AsultanKudaratData, 'yes'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countARBPosTotalARBs(ess3AsultanKudaratData, 'yes'))}
+            </div>
+          </div>
+        </Transition>
+        {/**NO ARB POSSESSION */}
+        <Transition
+          show={noARBPosShow}
+          enter="transition-opacity duration-150"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition-opacity duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className={gridClassName}>
+            {/**NORTH COTABATO */}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/cotabato.png" alt='DAR North Cotabato Logo'/>
+              {/* <Image width={100} height={100} src="/images/cotabato.png" alt='DAR North Cotabato Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AnorthCotData, 'no'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-red-600', countARBPosAreas(ess3AnorthCotData, 'no'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-red-600', countARBPosMales(ess3AnorthCotData, 'no'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-red-600', countARBPosFemales(ess3AnorthCotData, 'no'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-red-600', countARBPosTotalARBs(ess3AnorthCotData, 'no'))}
+            </div>
+            {/**SOUTH COTABATO */}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' />
+              {/* <Image width={100} height={100} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AsouthCotData, 'no'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-red-600', countARBPosAreas(ess3AsouthCotData, 'no'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-red-600', countARBPosMales(ess3AsouthCotData, 'no'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-red-600', countARBPosFemales(ess3AsouthCotData, 'no'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-red-600', countARBPosTotalARBs(ess3AsouthCotData, 'no'))}
+            </div>
+            {/**SARANGNI */}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/sarangani.png" alt='DAR sarangani Logo' />
+              {/* <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AsaranganiData, 'no'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-red-600', countARBPosAreas(ess3AsaranganiData, 'no'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-red-600', countARBPosMales(ess3AsaranganiData, 'no'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-red-600', countARBPosFemales(ess3AsaranganiData, 'no'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-red-600', countARBPosTotalARBs(ess3AsaranganiData, 'no'))}
+            </div>
+            {/**SULTAN KUDARAT*/}
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> setShowDisableModal(true)}>
+              <img className={imgClassName} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' />
+              {/* <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' /> */}
+              {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AsultanKudaratData, 'no'))}
+              {overviewProvinceData(<MdMap />, 'Area', 'text-red-600', countARBPosAreas(ess3AsultanKudaratData, 'no'))}
+              {overviewProvinceData(<MdFace6 />, 'Male', 'text-red-600', countARBPosMales(ess3AsultanKudaratData, 'no'))}
+              {overviewProvinceData(<MdFace3 />, 'Female', 'text-red-600', countARBPosFemales(ess3AsultanKudaratData, 'no'))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-red-600', countARBPosTotalARBs(ess3AsultanKudaratData, 'no'))}
+            </div>
+          </div>
+        </Transition>
+        {/**TABLE CONTAINER */}
+        <div className='bg-white rounded-3xl mt-10 pl-5 pr-5 shadow-md max-w-full overflow-x-auto'>
+          <div className={`flex justify-between ${isLaptop ? 'flex-wrap' : ''}`}>
+            <div className={`flex items-center ${isLaptop ? 'flex-wrap' : ''}`}>
+              <div className={`flex  ${isLaptop ? 'flex-wrap' : ''}`}>
+                <div className='flex items-center'>
+                  <MdSearch className='absolute mt-4 ml-2 text-2xl' />
+                  <input
+                    className='rounded-3xl h-12 w-auto border-2 mt-4 pl-8 align-middle pr-3'
+                    type='text'
+                    placeholder='Search'
+                    value={searchQuery}
+                    onChange={handlesSearchQuery} />
+                  <MdClose
+                    className='absolute mt-4 ml-48 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
+                    onClick={() => setSearchQuery('')} />
 
-                  </div>
-                  <div
-                    className='flex items-center justify-center 
+                </div>
+                <div
+                  className='flex items-center justify-center 
               rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary
                text-grey-primary font-semibold shadow-sm cursor-pointer border-1 
                border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
-                    onClick={isLocalhost ? () => setShowCountBlankModal(true) : () => setShowDisableModal(true)}
+                  onClick={isLocalhost ? () => setShowCountBlankModal(true) : () => setShowDisableModal(true)}
 
-                  >Count Blanks
-                  </div>
-                </div>
-
-
-              </div>
-              <div className={`flex items-center gap-5 ${isMobile ? 'flex-wrap' : ''}`}>
-                {selectedFile && uploadingStatus && (
-                  <>
-                    <button className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full' onClick={handleUpload}>Upload</button>
-                    <p className="ml-2 mt-3 text-sm text-green-700">
-                      <b>Selected file:</b> <i>{selectedFile.name}</i>
-                    </p>
-                  </>
-
-                )}
-                <div
-                  className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
-                  onClick={isLocalhost ? openFileInput : () => setShowDisableModal(true)} // Disable the onClick event if isLocalhost is false
-                >
-                  <MdUpload className='text-2xl' />
-                  <label className='cursor-pointer'>
-                    Upload New Data
-                  </label>
-                  <input
-                    ref={inputRef}
-                    type='file'
-                    accept='.csv'
-                    className="hidden"
-                    onChange={handleFileChange}
-                    disabled={!isLocalhost} // Disable the input element if isLocalhost is false
-                  />
+                >Count Blanks
                 </div>
               </div>
 
 
             </div>
+{/* 
+            {yesARBPosShow ? (
+              <div className='flex justify-center items-center'>
+                yes
+              </div>
+            ) : <div className='flex justify-center items-center'>
+              no
+            </div>} */}
 
-            <div className=" my-4 border-t border-navy-primary pb-4">
+            <div className={`flex items-center gap-5 ${isLaptop ? 'flex-wrap' : ''}`}>
+              {selectedFile && uploadingStatus && (
+                <>
+                  <button className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full' onClick={handleUpload}>Upload</button>
+                  <p className="ml-2 mt-3 text-sm text-green-700">
+                    <b>Selected file:</b> <i>{selectedFile.name}</i>
+                  </p>
+                </>
 
-              <Tab.Group>
-                <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1 mt-4 overflow-x-auto">
-
-                  <Tab
-                    className={({ selected }) =>
-                      classNames(
-                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                        selected
-                          ? 'bg-white shadow'
-                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                      )
-                    }
-                    selected={activeTab === 'north-cotabato'}
-                    onClick={() => handleTabChange('north-cotabato')}
-                  >
-                    North Cotabato
-                  </Tab>
-                  <Tab
-                    className={({ selected }) =>
-                      classNames(
-                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                        selected
-                          ? 'bg-white shadow'
-                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                      )
-                    }
-                    selected={activeTab === 'sarangani'}
-                    onClick={() => handleTabChange('sarangani')}
-                  >
-                    Sarangani
-                  </Tab>
-                  <Tab
-                    className={({ selected }) =>
-                      classNames(
-                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                        selected
-                          ? 'bg-white shadow'
-                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                      )
-                    }
-                    selected={activeTab === 'south-cotabato'}
-                    onClick={() => handleTabChange('south-cotabato')}
-                  >
-                    South Cotabato
-                  </Tab>
-                  <Tab
-                    className={({ selected }) =>
-                      classNames(
-                        'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
-                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
-                        selected
-                          ? 'bg-white shadow'
-                          : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
-                      )
-                    }
-                    selected={activeTab === 'sultan-kudarat'}
-                    onClick={() => handleTabChange('sultan-kudarat')}
-                  >
-                    Sultan Kudarat
-                  </Tab>
-                </Tab.List>
-                <Tab.Panels className="mt-2  ">
-                  <Tab.Panel><Ess3aTable tableData={northCotData ? filteredNorthCotData : []} isMobile={isMobile} /></Tab.Panel>
-                  <Tab.Panel><Ess3aTable tableData={saranganiData ? filteredSaranganiData : []} isMobile={isMobile} /></Tab.Panel>
-                  <Tab.Panel><Ess3aTable tableData={southCotData ? filteredSouthCotData : []} isMobile={isMobile} /></Tab.Panel>
-                  <Tab.Panel><Ess3aTable tableData={sultanKudaratData ? filteredSultanKudaratData : []} isMobile={isMobile} /></Tab.Panel>
-                </Tab.Panels>
-              </Tab.Group>
-
+              )}
+              <div
+                className='flex items-center justify-center rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary text-grey-primary font-semibold shadow-sm cursor-pointer border-1 border-solid hover:border-white hover:rounded-full hover:bg-opacity-95'
+                onClick={isLocalhost ? openFileInput : () => setShowDisableModal(true)} // Disable the onClick event if isLocalhost is false
+              >
+                <MdUpload className='text-2xl' />
+                <label className='cursor-pointer'>
+                  Upload New Data
+                </label>
+                <input
+                  ref={inputRef}
+                  type='file'
+                  accept='.csv'
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={!isLocalhost} // Disable the input element if isLocalhost is false
+                />
+              </div>
             </div>
+
 
           </div>
- 
+
+          <div className=" my-4 border-t border-navy-primary pb-4">
+
+            <Tab.Group>
+              <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1 mt-4 overflow-x-auto">
+
+                <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                      selected
+                        ? 'bg-white shadow'
+                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                    )
+                  }
+                  selected={activeTab === 'north-cotabato'}
+                  onClick={() => handleTabChange('north-cotabato')}
+                >
+                  North Cotabato
+                </Tab>
+                <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                      selected
+                        ? 'bg-white shadow'
+                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                    )
+                  }
+                  selected={activeTab === 'sarangani'}
+                  onClick={() => handleTabChange('sarangani')}
+                >
+                  Sarangani
+                </Tab>
+                <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                      selected
+                        ? 'bg-white shadow'
+                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                    )
+                  }
+                  selected={activeTab === 'south-cotabato'}
+                  onClick={() => handleTabChange('south-cotabato')}
+                >
+                  South Cotabato
+                </Tab>
+                <Tab
+                  className={({ selected }) =>
+                    classNames(
+                      'w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700',
+                      'ring-white ring-opacity-60 ring-offset-2 ring-offset-navy-primary focus:outline-none focus:ring-2',
+                      selected
+                        ? 'bg-white shadow'
+                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-navy-primary'
+                    )
+                  }
+                  selected={activeTab === 'sultan-kudarat'}
+                  onClick={() => handleTabChange('sultan-kudarat')}
+                >
+                  Sultan Kudarat
+                </Tab>
+              </Tab.List>
+              <Tab.Panels className="mt-2  ">
+                {yesARBPosShow ?
+                  <>
+                    <Tab.Panel><Ess3aTable tableData={southCotARBPosData ? filteredNorthCotData : []} isLaptop={isLaptop} /></Tab.Panel>
+                    <Tab.Panel><Ess3aTable tableData={northCotARBPosData ? filteredSaranganiData : []} isLaptop={isLaptop} /></Tab.Panel>
+                    <Tab.Panel><Ess3aTable tableData={saranganiARBPosData ? filteredSouthCotData : []} isLaptop={isLaptop} /></Tab.Panel>
+                    <Tab.Panel><Ess3aTable tableData={sultanKudaratARBPosData ? filteredSultanKudaratData : []} isLaptop={isLaptop} /></Tab.Panel>
+                  </> :
+                  <>
+                    <Tab.Panel><Ess3aTable tableData={southCotARBPosData ? filteredNorthCotData : []} isLaptop={isLaptop} /></Tab.Panel>
+                    <Tab.Panel><Ess3aTable tableData={northCotARBPosData ? filteredSaranganiData : []} isLaptop={isLaptop} /></Tab.Panel>
+                    <Tab.Panel><Ess3aTable tableData={saranganiARBPosData ? filteredSouthCotData : []} isLaptop={isLaptop} /></Tab.Panel>
+                    <Tab.Panel><Ess3aTable tableData={sultanKudaratARBPosData ? filteredSultanKudaratData : []} isLaptop={isLaptop} /></Tab.Panel>
+                  </>
+
+                }
+                <Tab.Panel><Ess3aTable tableData={ess3AnorthCotData ? filteredNorthCotData : []} isLaptop={isLaptop} /></Tab.Panel>
+                <Tab.Panel><Ess3aTable tableData={ess3AsaranganiData ? filteredSaranganiData : []} isLaptop={isLaptop} /></Tab.Panel>
+                <Tab.Panel><Ess3aTable tableData={ess3AsouthCotData ? filteredSouthCotData : []} isLaptop={isLaptop} /></Tab.Panel>
+                <Tab.Panel><Ess3aTable tableData={ess3AsultanKudaratData ? filteredSultanKudaratData : []} isLaptop={isLaptop} /></Tab.Panel>
+              </Tab.Panels>
+            </Tab.Group>
+
+          </div>
+
+        </div>
+
       </Layout>
       <CountBlankModal
         isOpen={showCountBlankModal}
         isClose={() => setShowCountBlankModal(!showCountBlankModal)}
-        southCotData={southCotData}
-        northCotData={northCotData}
-        saranganiData={saranganiData}
-        sultanKudaratData={sultanKudaratData} />
+        ess3AsouthCotData={ess3AsouthCotData}
+        ess3AnorthCotData={ess3AnorthCotData}
+        ess3AsaranganiData={ess3AsaranganiData}
+        ess3AsultanKudaratData={ess3AsultanKudaratData} />
       <DisableModal
         isOpen={showDisableModal}
         isClose={() => setShowDisableModal(!showDisableModal)} />
