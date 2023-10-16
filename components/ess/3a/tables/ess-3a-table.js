@@ -1,4 +1,4 @@
-import React, {useState } from 'react'
+import React, {useEffect, useState } from 'react'
 import ProvinceDataModal from '../../../modal/provinceDataModal';
 import {MdSouth } from 'react-icons/md';
 
@@ -38,6 +38,12 @@ export default function Ess3aTable(props) {
 
     const noNumberColumnDatas = ['First Name', 'Middle Name', 'Last Name', 'Gender'];
 
+    useEffect(() => {
+      setCurrentPage(1)
+    
+
+    }, [props.tableData])
+    
     const sortedData = (column) => {
       
       if (props.tableData) {
@@ -146,14 +152,9 @@ export default function Ess3aTable(props) {
         break;
     }
   }
-    
-  const column = [{
-    label:'Collective CLOA Sequence Number'
-
-  }]
     return (
       <div className='z-0'>
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg min-h-[27vh]">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg min-h-[250px] h-fit">
           <table className="w-full text-sm text-left text-gray-500">
             <thead className="text-xs text-gray-700 uppercase bg-gray-200">
               <tr>
