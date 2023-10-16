@@ -26,6 +26,7 @@ import { useMenu } from "../pages/api/MenuContext";
 import HelpModal from "./modal/helpmodal";
 import Suis from "./modal/suismodal";
 import Image from "next/image";
+import { useDatas } from "../pages/api/Datas";
 
 
 export default function Layout({ children }) {
@@ -52,6 +53,8 @@ export default function Layout({ children }) {
     const alternateImage = '/images/RPS-Logo.png';
     const [isImageFading, setIsImageFading] = useState(false);
 
+    const {isMobile, isLaptop} = useDatas()
+
     useEffect(() => {   
         const intervalId = setInterval(() => {
             setIsImageFading(true); // Trigger the fade-out effect
@@ -66,13 +69,14 @@ export default function Layout({ children }) {
 
     return (
         <div className="flex flex-col justify-center items-center min-h-screen ">
-            <header className="bg-navy-primary text-grey-primary fixed top-0 left-0 right-0 h-14 flex justify-center items-center font-bold uppercase overflow-hidden z-10">
-      
-            {/* <header className="bg-navy-primary text-grey-primary fixed top-0 h-14 flex justify-center items-center font-bold uppercase w-screen"> */}
-                <MdMenu className="text-5xl p-2 mr-0 absolute bg-transparent text-grey-primary rounded-full left-1 top-1 cursor-pointer border-grey-primary border-solid hover:border-2 " onClick={toggleDisclosure} />
-             
-                <Image src='/images/SUIS-Logo.png' height={50} width={50} alt="SUIS Logo" />
-                <h1 className="text-xl ml-5">SPLIT UNIFIED INFORMATION SYSTEM - BETA</h1>
+            <header className="bg-navy-primary text-grey-primary fixed top-0 left-0 right-0 h-14 flex items-center justify-center font-bold uppercase overflow-hidden z-10">
+            <MdMenu className="text-5xl p-2 absolute bg-transparent w-fit text-grey-primary rounded-full left-1 top-1 cursor-pointer border-grey-primary border-solid hover:border-2 " onClick={toggleDisclosure} />
+            
+             <div className="flex items-center text-center">
+             <Image className={`${isMobile?'ml-10':''}`} src='/images/SUIS-Logo.png' height={50} width={50} alt="SUIS Logo" />
+                <label className={`${isMobile?'text-xs':'text-2xl'} xl:text-2xl lg:text-xl md:text-lg sm:text-xs`}>SPLIT UNIFIED INFORMATION SYSTEM - BETA</label>
+             </div>
+   
             
          
             </header>
@@ -82,7 +86,7 @@ export default function Layout({ children }) {
                     <div className="h-[100%] w-[100%] overflow-hidden bg-gray-600 bg-opacity-50 z-10 fixed top-0 left-0" onClick={toggleDisclosure}></div>
                 ) : null}
                 <Disclosure>
-                    <div style={{ width: disclosureOpen ? '' : '0' }} className={`w-1/2 h-screen bg-navy-primary z-20 fixed top-0 lg:left-0 lg:w-60 peer-focus:left-0 left-0 peer:transition ease-out delay-150 duration-200 overflow-hidden ${disclosureOpen ? 'p-6' : 'p-0'}`}>
+                    <div style={{ width: disclosureOpen ? '' : '0' }} className={`h-full w-60 bg-navy-primary z-20 fixed top-0 lg:left-0 peer-focus:left-0 left-0 peer:transition ease-out delay-150 duration-200 overflow-hidden ${disclosureOpen ? 'p-6' : 'p-0'}`}>
                         <BsX className="bg-transparent text-grey-primary text-5xl rounded-full absolute right-1 top-4 cursor-pointer border-grey-primary border-solid hover:border-2 " onClick={toggleDisclosure} />:
                         <div className="flex flex-col justify-start item-center">
                             <div className="flex justify-center items-end border-b-2">
@@ -317,9 +321,9 @@ export default function Layout({ children }) {
                 <HelpModal isOpen={helpIsOpen} closeHelp={() => setHelpIsOpen(!helpIsOpen)} />
                 <Suis isOpen={suisIsOpen} closeHelp={() => setSuisIsOpen(!suisIsOpen)} />
             </div>
-            <footer className="bg-navy-primary text-grey-primary fixed bottom-0 left-0 right-0 h-10 flex justify-center items-center font-bold uppercase">
+            <footer className="bg-navy-primary text-grey-primary fixed bottom-0 left-0 right-0 h-10 flex justify-center items-center font-bold uppercase text-center">
                 <Image src='/images/RPS-Logo.png' height={50} width={50} alt="RPS Logo" />
-                © 2023 - Regional Planning Section
+               <label className={`${isMobile?'text-xs':'text-2xl'} xl:text-2xl lg:text-xl md:text-lg sm:text-xs`}>© 2023 - Regional Planning Section</label> 
             </footer>
         </div>
     );

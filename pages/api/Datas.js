@@ -6,7 +6,7 @@ const Datas = createContext();
 
 export function DatasProvider({ children }) {
       //CHECK IF LOCALHOST OR ONLINE
-  const isLocalhost = process.env.NEXT_PUBLIC_URL.includes('localhostz');
+  const isLocalhost = process.env.NEXT_PUBLIC_URL.includes('localhost');
     //Define the pronvinces 
     const provinces = ['north-cotabato', 'sarangani', 'south-cotabato', 'sultan-kudarat'];
 
@@ -24,6 +24,8 @@ export function DatasProvider({ children }) {
     const [localStorageEss3aYesPossession, setLocalStorageEss3aYesPossession] = useState()
     const [localStorageEss3aNoPossession, setLocalStorageEss3aNoPossession] = useState()
 
+    const [isMobile, setIsMobile] = useState(false)
+    const [isLaptop, setIsLaptop] = useState(false)
 
     async function getEss3ADatas() {
         const postData = {
@@ -92,6 +94,28 @@ export function DatasProvider({ children }) {
     });
   }
 
+  
+  useEffect(() => {
+    // Check if the screen width is less than a certain value (e.g., 768 for mobile devices)
+    const isMobileDevice = window.innerWidth < 640;
+    const isLaptopDevice = window.innerWidth < 1492
+    setIsMobile(isMobileDevice);
+    setIsLaptop(isLaptopDevice)
+    // Listen for window resize events to update the state when the screen size changes
+    const handleResize = () => {
+      const isMobileDevice = window.innerWidth < 640;
+      const isLaptopDevice = window.innerWidth < 1492
+      setIsMobile(isMobileDevice);
+      setIsLaptop(isLaptopDevice)
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
     //FETCH DATAS
     useEffect(() => {
         if (isLocalhost) {
@@ -114,6 +138,8 @@ export function DatasProvider({ children }) {
         <Datas.Provider
             value={{
                 isLocalhost,
+                isMobile,
+                isLaptop,
                 localStorageEss3ATotalSeqNo,
                 localStorageEss3ATotalArea,
                 localStorageEss3ATotalMale,
