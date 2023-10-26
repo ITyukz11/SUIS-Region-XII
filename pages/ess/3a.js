@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import Layout from '../../components/layout'
 import { MdFace3, MdFace6, MdFormatListNumbered, MdGroups2, MdMap, MdSearch, MdUpload, MdClose, MdThumbUpAlt, MdThumbDownAlt, MdChevronRight, MdChevronLeft } from 'react-icons/md'
 import { Tab, Transition } from '@headlessui/react'
-import Image from 'next/image'
 import csv from 'csv-parser'; // Import the csv-parser library
 import Swal from 'sweetalert2'
 import CountBlankModal from '../../components/ess/3a/modals/countblankmodal'
@@ -10,15 +9,21 @@ import DisableModal from '../../components/ess/3a/modals/disablemodal'
 import Ess3aTable from '../../components/ess/3a/tables/ess-3a-table'
 import Counter from '../../components/Counter'
 import { useDatas } from '../api/Datas'
-import ArbPossessionModal from '../../components/ess/3a/modals/arbpossessionmodal'
+import TableModal from '../../components/ess/3a/modals/table-modal'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function ThreeA() {
-  const { isLocalhost, isMobile, isLaptop, localStorageTotalSeqNo, localStorageTotalArea, localStorageTotalMale, localStorageTotalFemale, localStorageTotalARB,
+  const { isLocalhost, isMobile, isLaptop,    
+    localStorageEss3ATotalSeqNo,
+    localStorageEss3ATotalArea,
+    localStorageEss3ATotalMale,
+    localStorageEss3ATotalFemale,
+    localStorageEss3ATotalARB,
     localStorageEss3aYesPossession, localStorageEss3aNoPossession,
+    localStorageEss3AnorthCotData,localStorageEss3AsaranganiData,localStorageEss3AsoutCotData,localStorageEss3AsultanKudaratData,
     getEss3ADatas, ess3AnorthCotData, ess3AsaranganiData, ess3AsouthCotData, ess3AsultanKudaratData } = useDatas();
 
 
@@ -32,6 +37,8 @@ export default function ThreeA() {
   const [uploadingStatus, setUploadingStatus] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
 
+  //file name required 3a or 3b
+  const [fileName, setFileName] = useState();
   //Modal for counting blanks
   const [showCountBlankModal, setShowCountBlankModal] = useState(false)
   const [showDisableModal, setShowDisableModal] = useState(false)
@@ -48,16 +55,16 @@ export default function ThreeA() {
   const [sultanKudaratARBPosData, setSultanKudaratARBPosData] = useState([]);
 
   //Raw Datas for ARB Still in Possession for table 
-  const [arbPossessionDatas, setArbPossessionDatas] = useState()
+  const [data, setData] = useState()
 
   //Show arb possession raw datas modal
-  const [showArbPossessionModal, setShowArbPossessionModal] = useState(false)
+  const [showTableModal, setShowTableModal] = useState(false)
   const [provinceArb, setProvinceArb] = useState('')
   const [provinceImage, setProvinceImage] =useState('')
 
   const inputRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState('sarangani'); // Initialize with the index of the default active tab NOT WORKING, I created tabIndex instead
+  const [activeTab, setActiveTab] = useState(''); // Initialize with the index of the default active tab NOT WORKING, I created tabIndex instead
   const [tabIndex, setTabIndex] = useState(0)
   //Getting the error message from api
   const [errorPostReq, setErrorPostReq] = useState('')
@@ -285,25 +292,25 @@ export default function ThreeA() {
     }
 
     let seqNoCount = 0
-    if (isLocalhost) {
+   // if (isLocalhost) {
       seqNoCount = datas.reduce((count, item) => {
+        const seqNo = item['Collective CLOA Sequence Number']
         // Check if the item has a SeqNo property
-        if (item['Collective CLOA Sequence Number']) {
+        if (seqNo && seqNo>0)  {
           // Increment the count by 1 for each occurrence of SeqNo
           return count + 1;
         }
         return count;
       }, 0);
-    } else {
-      seqNoCount = datas[0].seqno
-      console.log("datas: ", datas)
-    }
+    // } else {
+    //   seqNoCount = datas[0].seqno
+    //   console.log("datas: ", datas)
+    // }
 
 
     return seqNoCount;
   };
-
-  // Function to count the occurrences of CLOA AREA
+  // Function to count how many CLOA AREA
   const countAreas = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
       return <div role="status" className="max-w-sm animate-pulse">
@@ -311,23 +318,22 @@ export default function ThreeA() {
       </div>; // return '-' if datas is not an array or is empty
     }
     let cloaAreaCount = 0
-    if (isLocalhost) {
-      cloaAreaCount = datas ? datas.reduce((count, item) => {
-        // Check if the item has CLOA AREA data
+   
+  //if (isLocalhost) {
+    cloaAreaCount = datas ? datas.reduce((count, item) => {
+      const area = item['Actual area of tillage/cultivation (in square meters)'];
+      if (area && !isNaN(area) && area.length <8) {
+        return count + parseFloat(area); // Parse and add the area value
+      }
+      return count;
+    }, 0) : 0; // Set initial value to 0
+  // } else {
+  //     cloaAreaCount = datas[0].area
+  //   }
 
-        const area = item['Actual area of tillage/cultivation (in square meters)']
-        if (area && area != 0) {
-          // Increment the count by 1 for each occurrence of CLOA AREA
-          return count + 1;
-        }
-        return count;
-      }, 0) : '';
-    } else {
-      cloaAreaCount = datas[0].area
-    }
-    return cloaAreaCount;
+    const finalArea = cloaAreaCount / 10000 //HAS hectare unit
+    return finalArea;
   };
-
   const countTotalMales = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
       return <div role="status" className="max-w-sm animate-pulse">
@@ -335,7 +341,7 @@ export default function ThreeA() {
       </div>; // return '-' if datas is not an array or is empty
     }
     let maleNoCount = 0
-    if (isLocalhost) {
+   // if (isLocalhost) {
       maleNoCount = datas ? datas.reduce((count, item) => {
         // Check if the item has a SeqNo property
 
@@ -347,12 +353,11 @@ export default function ThreeA() {
         }
         return count;
       }, 0) : '';
-    } else {
-      maleNoCount = datas[0].male
-    }
+    // } else {
+    //   maleNoCount = datas[0].male
+    // }
     return maleNoCount;
   }
-
   const countTotalFemales = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
       return <div role="status" className="max-w-sm animate-pulse">
@@ -360,7 +365,7 @@ export default function ThreeA() {
       </div>; // return '-' if datas is not an array or is empty
     }
     let femaleNoCount = 0
-    if (isLocalhost) {
+   // if (isLocalhost) {
       femaleNoCount = datas ? datas.reduce((count, item) => {
         // Check if the item has a SeqNo property
 
@@ -372,33 +377,46 @@ export default function ThreeA() {
         }
         return count;
       }, 0) : '';
-    } else {
-      femaleNoCount = datas[0].female
-    }
+    // } else {
+    //   femaleNoCount = datas[0].female
+    // }
     return femaleNoCount;
   }
-
   const countTotalARBs = (datas) => {
     if (!Array.isArray(datas) || datas.length === 0) {
-      return <div role="status" className="max-w-sm animate-pulse">
-        <div className="h-4 mt-auto bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
-      </div>; // return '-' if datas is not an array or is empty
+      return (
+        <div role="status" className="max-w-sm animate-pulse">
+          <div className="h-4 mt-auto bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+        </div>
+      );
     }
-    let totalARB = 0
-    if (isLocalhost) {
-      totalARB = datas ? datas.reduce((count, item) => {
-        // Check if the item has a SeqNo property
-        if (item['Is the ARB still in possession?']) {
-          // Increment the count by 1 for each occurrence of SeqNo
-          return count + 1;
+  
+    // Create a Set to store unique names
+    const uniqueNames = new Set();
+  
+    let totalARB = 0;
+  
+    //if (isLocalhost) {
+      datas.forEach((item) => {
+        const firstName =  item['First Name']
+        const lastName =item['Last Name']
+        if (firstName && lastName) {
+          const fullName = `${firstName} ${lastName}`;
+  
+          // Check if the name is unique in the Set, then increment the count
+          if (!uniqueNames.has(fullName)) {
+            uniqueNames.add(fullName);
+            totalARB += 1;
+          }
         }
-        return count;
-      }, 0) : '';
-    } else {
-      totalARB = datas[0].totalarb
-    }
+      });
+    // } else {
+    //   totalARB = datas[0].totalarb;
+    // }
+  
     return totalARB;
-  }
+  };
+  
 
   const countTotalYesOrNoArbInPos = (datas, possession) => {    
     let total = 0
@@ -433,23 +451,23 @@ export default function ThreeA() {
         totalARB += countTotalARBs(data);
       }
     }
-    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
+    if (!localStorageEss3ATotalSeqNo == undefined || localStorageEss3ATotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalSeqNo(totalSeqNo)
       localStorage.setItem('ess3aTotalSeqNo', totalSeqNo);
     }
-    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
+    if (!localStorageEss3ATotalSeqNo == undefined || localStorageEss3ATotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalArea(totalArea)
       localStorage.setItem('ess3aTotalArea', totalArea);
     }
-    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
+    if (!localStorageEss3ATotalSeqNo == undefined || localStorageEss3ATotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalMale(totalMale)
       localStorage.setItem('ess3aTotalMale', totalMale);
     }
-    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
+    if (!localStorageEss3ATotalSeqNo == undefined || localStorageEss3ATotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalFemale(totalFemale)
       localStorage.setItem('ess3aTotalFemale', totalFemale);
     }
-    if (!localStorageTotalSeqNo == undefined || localStorageTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
+    if (!localStorageEss3ATotalSeqNo == undefined || localStorageEss3ATotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalARB(totalARB)
       localStorage.setItem('ess3aTotalARB', totalARB);
     }
@@ -470,7 +488,7 @@ export default function ThreeA() {
               <div className="h-7 bg-gray-200 rounded-md dark:bg-gray-700 w-14 mb-4"></div>
             </div>
           ) : (
-            <label className="font-semibold mt-auto  sm:text-xs md:text-lg lg:text-2xl xl:text-3xl 2xl:text-4xl cursor-pointer">{data ? Number(data).toLocaleString() : ''}</label>
+            <label className="font-semibold mt-auto  sm:text-xs md:text-lg lg:text-2xl xl:text-3xl 2xl:text-4xl cursor-pointer">{data ? Math.floor(data).toLocaleString() : ''}</label>
           )}
         </div>
       </div>
@@ -484,7 +502,10 @@ export default function ThreeA() {
       <div className='w-fit flex flex-col text-left justify-start items-center cursor-pointer'>
         {styledImage}
         <label className='font-bold text-navy-primary cursor-pointer'>{title}</label>
-        <label className={`font-semibold ${color} mt-auto sm:text-xs md:text-base lg:text-base xl:text-lg 2xl:text-xl cursor-pointer`}>{data}</label>
+        <label className={`font-semibold ${color} mt-auto sm:text-xs md:text-base lg:text-base xl:text-lg 2xl:text-xl cursor-pointer`}>{Math.round(data) || data == 0 ? Math.round(data).toLocaleString() :
+          <div role="status" className="max-w-sm animate-pulse">
+            <div className="h-4 mt-auto bg-gray-200 rounded-full dark:bg-gray-700 w-8 mb-4"></div>
+          </div>}</label>
       </div>
     )
   }
@@ -698,16 +719,13 @@ export default function ThreeA() {
 const ARBPossessionRawDatas = (datas, possession) => {
   // Change to lowercase to match other cases
   const filteredData = datas ? datas.filter((item) => {
-    if (item['Is the ARB still in possession?'].toLowerCase() === possession) {
+    if (item['Is the ARB still in possession?']?item['Is the ARB still in possession?'].toLowerCase() === possession:'') {
       return true;
     }
     return false;
   }) : '';
   return filteredData;
 }
-
-
-
 
   useEffect(() => {
     calculateTotalStatistics();
@@ -1050,18 +1068,19 @@ const ARBPossessionRawDatas = (datas, possession) => {
     }
   };
 
-
-const handlesArbPossessionmodal = (province, provinceLogo,datas,possession) => {
+console.log("ess3AnorthCotData: ",ess3AnorthCotData)
+const handlesTableModal = (province, provinceLogo,datas,possession,fileName) => {
   setProvinceArb(province)
   setProvinceImage(provinceLogo)
-  setShowArbPossessionModal(!showArbPossessionModal)
-  setArbPossessionDatas(ARBPossessionRawDatas(datas, possession))
+  setShowTableModal(!showTableModal)
+  setFileName(fileName)
+  setData(possession ? ARBPossessionRawDatas(datas, possession) : datas);
 }
 const tableSectionRef = useRef(null);
 
 const scrollToSection = (ref) => {
   if (ref.current) {
-    ref.current.scrollIntoView({ behavior: 'smooth' });
+    ref.current.scrollIntoView({ behavior: 'smooth' }); 
   }
 };
 
@@ -1075,22 +1094,22 @@ const scrollToSection = (ref) => {
           {/* <Image width={180} height={170} src="/images/dar-region12-logo.png" alt='dar region 12 logo' /> */}
           <img className={`${isMobile ? 'w-[80px] h-[80px]' : 'w-[170px] h-[170px]'} sm:w-[70px] md:w-[80px] lg:w-[100px] xl:w-[120px] 2xl:w-[140px] sm:h-[70px] md:h-[80px] lg:h-[100px] xl:h-[120px] 2xl:h-[140px] `} src="/images/dar-region12-logo.png" alt='dar region 12 logo' />
           <div className='flex flex-row justify-center gap-9 md:gap-9 xl:gap-12 2xl:gap-16 items-center'>
-            {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageTotalSeqNo == undefined ? totalSeqNo : localStorageTotalSeqNo)}
-            {overviewData(<MdMap />, 'Area:', localStorageTotalArea == undefined ? totalArea : localStorageTotalArea)}
-            {overviewData(<MdFace6 />, 'Male:', localStorageTotalMale == undefined ? totalMale : localStorageTotalMale)}
-            {overviewData(<MdFace3 />, 'Female:', localStorageTotalFemale == undefined ? totalFemale : localStorageTotalFemale)}
-            {overviewData(<MdGroups2 />, 'ARBs:', localStorageTotalARB == undefined ? totalARB : localStorageTotalARB)}
+            {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageEss3ATotalSeqNo == undefined ? totalSeqNo : localStorageEss3ATotalSeqNo)}
+            {overviewData(<MdMap />, 'Area:', localStorageEss3ATotalArea == undefined ? totalArea : localStorageEss3ATotalArea)}
+            {overviewData(<MdFace6 />, 'Male:', localStorageEss3ATotalMale == undefined ? totalMale : localStorageEss3ATotalMale)}
+            {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? totalFemale : localStorageEss3ATotalFemale)}
+            {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? totalARB : localStorageEss3ATotalARB)}
           </div>
           {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>ESS</label>}
         </div>
         {/**Provincial Datas Overview CONTAINER */}
         <div className={gridClassName}>
           {/**NORTH COTABATO */}
-          <div className={containerChildClassName} onClick={() => {scrollToSection(tableSectionRef);setTabIndex(0)}}>
+          <div className={containerChildClassName} onClick={()=> {handlesTableModal('North Cotabato',"/images/cotabato.png",ess3AnorthCotData,'','3A');setActiveTab('north-cotabato');}}>
             <img className={imgClassName} src="/images/cotabato.png" alt='dar region 12 logo' />
             {/* <Image width={100} height={100} src="/images/cotabato.png" alt='DAR North Cotabato Logo' /> */}
 
-            {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countSequenceNo(ess3AnorthCotData))}
+            {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countSequenceNo(ess3AnorthCotData?ess3AnorthCotData:[]))}
             {overviewProvinceData(<MdMap />, 'Area', 'text-green-700', countAreas(ess3AnorthCotData))}
             {overviewProvinceData(<MdFace6 />, 'Male', 'text-green-700', countTotalMales(ess3AnorthCotData))}
             {overviewProvinceData(<MdFace3 />, 'Female', 'text-green-700', countTotalFemales(ess3AnorthCotData))}
@@ -1098,7 +1117,7 @@ const scrollToSection = (ref) => {
           </div>
 
           {/**SOUTH COTABATO */}
-          <div className={containerChildClassName} onClick={() => {scrollToSection(tableSectionRef);setTabIndex(1)}}>
+          <div className={containerChildClassName} onClick={()=> {handlesTableModal('South Cotabato',"/images/south-cotabato.png",ess3AsouthCotData,'','3A');setActiveTab('south-cotabato')}}>
             <img className={imgClassName} src="/images/south-cotabato.png" alt='dar region 12 logo' />
             {/* <Image width={120} height={20} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' /> */}
             {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-blue-700', countSequenceNo(ess3AsouthCotData))}
@@ -1108,7 +1127,7 @@ const scrollToSection = (ref) => {
             {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-blue-700', countTotalARBs(ess3AsouthCotData))}
           </div>
           {/**SARANGANI */}
-          <div className={containerChildClassName} onClick={() => {scrollToSection(tableSectionRef);setTabIndex(2)}}>
+          <div className={containerChildClassName} onClick={()=> {handlesTableModal('Sarangani',"/images/sarangani.png",ess3AsaranganiData,'','3A');setActiveTab('sarangani')}}>
             <img className={imgClassName} src="/images/sarangani.png" alt='dar region 12 logo' />
             {/* <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' /> */}
             {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-yellow-600', countSequenceNo(ess3AsaranganiData))}
@@ -1118,7 +1137,7 @@ const scrollToSection = (ref) => {
             {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-yellow-600', countTotalARBs(ess3AsaranganiData))}
           </div>
           {/**SULTAN KUDARAT */}
-          <div className={containerChildClassName} onClick={() => {scrollToSection(tableSectionRef);setTabIndex(3)}}>
+          <div className={containerChildClassName} onClick={()=> {handlesTableModal('Sultan Kudarat',"/images/sultan-kudarat.png",ess3AsultanKudaratData,'','3A');setActiveTab('sultan-kudarat')}}>
             <img className={imgClassName} src="/images/sultan-kudarat.png" alt='dar region 12 logo' />
             {/* <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' /> */}
             {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-gray-600', countSequenceNo(ess3AsultanKudaratData))}
@@ -1160,7 +1179,7 @@ const scrollToSection = (ref) => {
         > 
           <div className={gridClassName}>
             {/**NORTH COTABATO */}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('North Cotabato',"/images/cotabato.png",ess3AnorthCotData,'yes') }>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('North Cotabato',"/images/cotabato.png",ess3AnorthCotData,'yes') }>
               <img className={imgClassName} src="/images/cotabato.png" alt='DAR North Cotabato Logo' />
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AnorthCotData, 'yes'))}
               {overviewProvinceData(<MdMap />, 'Area', 'text-green-700', countARBPosAreas(ess3AnorthCotData, 'yes'))}
@@ -1169,7 +1188,7 @@ const scrollToSection = (ref) => {
               {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countARBPosTotalARBs(ess3AnorthCotData, 'yes'))}
             </div>
             {/**SOUTH COTABATO */}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('South Cotabato',"/images/south-cotabato.png",ess3AsouthCotData,'yes')}>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('South Cotabato',"/images/south-cotabato.png",ess3AsouthCotData,'yes')}>
               <img className={imgClassName} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' />
               {/* <Image width={100} height={100} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' /> */}
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AsouthCotData, 'yes'))}
@@ -1179,7 +1198,7 @@ const scrollToSection = (ref) => {
               {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countARBPosTotalARBs(ess3AsouthCotData, 'yes'))}
             </div>
             {/**SARANGNI */}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('Sarangani',"/images/sarangani.png",ess3AsaranganiData,'yes')}>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('Sarangani',"/images/sarangani.png",ess3AsaranganiData,'yes')}>
               <img className={imgClassName} src="/images/sarangani.png" alt='DAR sarangani Logo' />
               {/* <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' /> */}
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AsaranganiData, 'yes'))}
@@ -1189,7 +1208,7 @@ const scrollToSection = (ref) => {
               {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-green-700', countARBPosTotalARBs(ess3AsaranganiData, 'yes'))}
             </div>
             {/**SULTAN KUDARAT*/}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('Sultan Kudarat',"/images/sultan-kudarat.png",ess3AsultanKudaratData,'yes')}>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('Sultan Kudarat',"/images/sultan-kudarat.png",ess3AsultanKudaratData,'yes')}>
               <img className={imgClassName} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' />
               {/* <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' /> */}
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-green-700', countARBPosSeqNo(ess3AsultanKudaratData, 'yes'))}
@@ -1212,7 +1231,7 @@ const scrollToSection = (ref) => {
         >
           <div className={gridClassName}>
             {/**NORTH COTABATO */}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('Cotabato',"/images/cotabato.png",ess3AnorthCotData,'no')}>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('Cotabato',"/images/cotabato.png",ess3AnorthCotData,'no')}>
               <img className={imgClassName} src="/images/cotabato.png" alt='DAR North Cotabato Logo'/>
               {/* <Image width={100} height={100} src="/images/cotabato.png" alt='DAR North Cotabato Logo' /> */}
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AnorthCotData, 'no'))}
@@ -1222,7 +1241,7 @@ const scrollToSection = (ref) => {
               {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-red-600', countARBPosTotalARBs(ess3AnorthCotData, 'no'))}
             </div>
             {/**SOUTH COTABATO */}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('South Cotabato',"/images/south-cotabato.png",ess3AsouthCotData,'no')}>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('South Cotabato',"/images/south-cotabato.png",ess3AsouthCotData,'no')}>
               <img className={imgClassName} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' />
               {/* <Image width={100} height={100} src="/images/south-cotabato.png" alt='DAR South Cotabato Logo' /> */}
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AsouthCotData, 'no'))}
@@ -1232,7 +1251,7 @@ const scrollToSection = (ref) => {
               {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-red-600', countARBPosTotalARBs(ess3AsouthCotData, 'no'))}
             </div>
             {/**SARANGNI */}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('Sarangani',"/images/sarangani.png",ess3AsaranganiData,'no')}>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('Sarangani',"/images/sarangani.png",ess3AsaranganiData,'no')}>
               <img className={imgClassName} src="/images/sarangani.png" alt='DAR sarangani Logo' />
               {/* <Image width={100} height={100} src="/images/sarangani.png" alt='DAR sarangani Logo' /> */}
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AsaranganiData, 'no'))}
@@ -1242,7 +1261,7 @@ const scrollToSection = (ref) => {
               {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-red-600', countARBPosTotalARBs(ess3AsaranganiData, 'no'))}
             </div>
             {/**SULTAN KUDARAT*/}
-            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesArbPossessionmodal('Sultan Kudarat',"/images/sultan-kudarat.png",ess3AsultanKudaratData,'no')}>
+            <div className={`${containerChildClassName} hover:bg-grey-primary cursor-pointer`} onClick={()=> handlesTableModal('Sultan Kudarat',"/images/sultan-kudarat.png",ess3AsultanKudaratData,'no')}>
               <img className={imgClassName} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' />
               {/* <Image width={100} height={100} src="/images/sultan-kudarat.png" alt='DAR Sultan Kudarat Logo' /> */}
               {overviewProvinceData(<MdFormatListNumbered />, 'SeqNo.', 'text-red-600', countARBPosSeqNo(ess3AsultanKudaratData, 'no'))}
@@ -1422,13 +1441,14 @@ const scrollToSection = (ref) => {
       <DisableModal
         isOpen={showDisableModal}
         isClose={() => setShowDisableModal(!showDisableModal)} />
-      <ArbPossessionModal
-        isOpen={showArbPossessionModal}
-        isClose={() => setShowArbPossessionModal(!showArbPossessionModal)}
-        tableData={arbPossessionDatas ? arbPossessionDatas : []} 
+      <TableModal
+        isOpen={showTableModal}
+        isClose={() => setShowTableModal(false)}
+        tableData={data ? data : []} 
+        fileName={fileName? fileName:''}
         provinceArb={provinceArb}
-        provinceImage={provinceImage}/>
-        
+        provinceImage={provinceImage}
+        provinceActive={activeTab}/>       
     </div>
   )
 }

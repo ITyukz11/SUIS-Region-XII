@@ -1,19 +1,109 @@
 import React from 'react'
 import Layout from '../components/layout'
+import { useDatas } from './api/Datas'
+import { MdFace3, MdFace6, MdFormatListNumbered, MdGroups2, MdMap } from 'react-icons/md';
+import Link from 'next/link';
 
 export default function dashboard() {
+
+  const { isMobile, isLaptop,
+    localStorageEss3ATotalSeqNo,
+    localStorageEss3ATotalArea,
+    localStorageEss3ATotalMale,
+    localStorageEss3ATotalFemale,
+    localStorageEss3ATotalARB, } = useDatas();
+
+  const overviewData = (image, title, data) => {
+    const styledImage = React.cloneElement(image, {
+      className: 'sm:text-base md:text-base lg:text-lg xl:text-xl',
+    });
+    return (
+      <div className="w-fit flex flex-col gap-1 text-left items-center">
+        <div className="flex flex-col items-center">
+          {styledImage}
+          <label className="font-bold text-navy-primary cursor-pointer text-xs">{title}</label>
+          {isNaN(data) ? (
+            <div role="status" className="max-w-sm animate-pulse">
+              <div className="h-7 bg-gray-200 rounded-md dark:bg-gray-700 w-14 mb-4"></div>
+            </div>
+          ) : (
+            <label className="font-semibold mt-auto  sm:text-xs md:text-base lg:text-xl xl:text-2xl 2xl:text-2xl">{data ? Number(data).toLocaleString() : 'No Data'}</label>
+          )}
+        </div>
+      </div>
+    )
+  };
+
+  const handlesLinkToEss = () => {
+
+  }
+
+  const overviewCss = 'w-full flex justify-center'
+  const containerOverviewCss = 'flex h-[75vh] justify-around bg-white rounded-3xl w-full p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5'
   return (
-    <div>
-<Layout>
-  <div className='flex justify-center items-center'>
-  <h1>
-DASHBOARD IS FOR ANALYTICS FOR SCOPE | WORKABLE | FUNDED | FIELD VALIDATION TEAM | SURVEY | REGISTRATION | E-T AND OVERVIEW
 
-</h1>
-  </div>
+    <Layout>
+      <div className={`${isMobile ? 'ml-5 mr-5' : isLaptop ? 'ml-40 mr-40' : 'ml-56 mr-56'}`}>
 
-</Layout>
+        <div className='flex justify-around bg-white rounded-3xl w-full h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5'>
+          <div className={overviewCss}>
+            <h1 className='font-bold text-2xl'>CCIS</h1>
+          </div>
+          <div className={`${overviewCss} border-r-2 border-l-2 border-black`}>
+            <h1 className='font-bold text-2xl'>Monitoring & Evaluation</h1>
+          </div>
+          <Link href='/ess/3a' className={`${overviewCss} cursor-pointer hover:bg-grey-primary`}  >
+            <div onClick={handlesLinkToEss}>
+              <h1 className='font-bold text-2xl'>ESS</h1>
+            </div>
+          </Link>
+        </div>
+        <div className='flex flex-row justify-center gap-5'>
+          <div className={containerOverviewCss}>
+            GLOBAL TARGET registered as of today
+          </div>
+          <div className={containerOverviewCss}>
+          </div>
+         
+          <div className={`flex flex-col justify-around ${containerOverviewCss}` }>
+            <div className='h-full hover:bg-grey-primary cursor-pointer'>
+              <label>Overall</label>
+              <div className='flex flex-row justify-center gap-5 h-full'>
+                {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageEss3ATotalSeqNo == undefined ? 0 : localStorageEss3ATotalSeqNo)}
+                {overviewData(<MdMap />, 'Area:', localStorageEss3ATotalArea == undefined ? 0 : localStorageEss3ATotalArea)}
+                {overviewData(<MdFace6 />, 'Male:', localStorageEss3ATotalMale == undefined ? 0 : localStorageEss3ATotalMale)}
+                {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? 0 : localStorageEss3ATotalFemale)}
+                {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? 0 : localStorageEss3ATotalARB)}
+              </div>
+            </div>
+            <div className='h-full border-t-2 border-b-2 hover:bg-grey-primary cursor-pointer'>
+              <label>ESMF 3A</label>
+              <div className='flex flex-row justify-center gap-5'>
+                {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageEss3ATotalSeqNo == undefined ? 0 : localStorageEss3ATotalSeqNo)}
+                {overviewData(<MdMap />, 'Area:', localStorageEss3ATotalArea == undefined ? 0 : localStorageEss3ATotalArea)}
+                {overviewData(<MdFace6 />, 'Male:', localStorageEss3ATotalMale == undefined ? 0 : localStorageEss3ATotalMale)}
+                {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? 0 : localStorageEss3ATotalFemale)}
+                {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? 0 : localStorageEss3ATotalARB)}
+              </div>
+            </div>
 
-    </div>
+            <div className='h-full hover:bg-grey-primary cursor-pointer'>
+              <label>ESMF 3B</label>
+              <div className='flex flex-row justify-center gap-5'>
+                {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageEss3ATotalSeqNo == undefined ? 0 : localStorageEss3ATotalSeqNo)}
+                {overviewData(<MdMap />, 'Area:', localStorageEss3ATotalArea == undefined ? 0 : localStorageEss3ATotalArea)}
+                {overviewData(<MdFace6 />, 'Male:', localStorageEss3ATotalMale == undefined ? 0 : localStorageEss3ATotalMale)}
+                {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? 0 : localStorageEss3ATotalFemale)}
+                {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? 0 : localStorageEss3ATotalARB)}
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+    </Layout>
+
+
   )
 }

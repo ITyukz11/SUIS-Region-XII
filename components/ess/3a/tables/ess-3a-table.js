@@ -34,8 +34,6 @@ export default function Ess3aTable(props) {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    console.log("sortActive: ", sortActive)
-
     const noNumberColumnDatas = ['First Name', 'Middle Name', 'Last Name', 'Gender'];
 
     useEffect(() => {

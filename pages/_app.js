@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import Loading from '../components/Loading';
 import Head from 'next/head';
 import { DatasProvider } from './api/Datas';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App({ Component, pageProps }) {
   const [isLoading, setIsLoading] = useState(false);

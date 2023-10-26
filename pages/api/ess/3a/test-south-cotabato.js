@@ -15,7 +15,8 @@ if (request.method === "GET") {
   //  const sortcolumn = `"${column}"`; // Wrap the column name in double quotes, assuming it's a column identifier
   //  const sortorderby = `${orderby}`;
 
-    const queryString = `SELECT * FROM ess_3a_south_cotabato`;
+  const queryString = `SELECT * FROM test_ess_3a_south_cotabato`;
+
 
     console.log(queryString);
 
