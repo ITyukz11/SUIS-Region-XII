@@ -22,7 +22,6 @@ export default function ThreeB() {
     localStorageEss3BTotalMale,
     localStorageEss3BTotalFemale,
     localStorageEss3BTotalARB,
-    localStorageEss3aYesPossession, localStorageEss3aNoPossession,
     getEss3BDatas, ess3BnorthCotData, ess3BsaranganiData, ess3BsouthCotData, ess3BsultanKudaratData } = useDatas();
 
 
@@ -455,23 +454,23 @@ export default function ThreeB() {
     }
     if (!localStorageEss3BTotalSeqNo == undefined || localStorageEss3BTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalSeqNo(totalSeqNo)
-      localStorage.setItem('ess3aTotalSeqNo', totalSeqNo);
+      localStorage.setItem('ess3bTotalSeqNo', totalSeqNo);
     }
     if (!localStorageEss3BTotalSeqNo == undefined || localStorageEss3BTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalArea(totalArea)
-      localStorage.setItem('ess3aTotalArea', totalArea);
+      localStorage.setItem('ess3bTotalArea', totalArea);
     }
     if (!localStorageEss3BTotalSeqNo == undefined || localStorageEss3BTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalMale(totalMale)
-      localStorage.setItem('ess3aTotalMale', totalMale);
+      localStorage.setItem('ess3bTotalMale', totalMale);
     }
     if (!localStorageEss3BTotalSeqNo == undefined || localStorageEss3BTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalFemale(totalFemale)
-      localStorage.setItem('ess3aTotalFemale', totalFemale);
+      localStorage.setItem('ess3bTotalFemale', totalFemale);
     }
     if (!localStorageEss3BTotalSeqNo == undefined || localStorageEss3BTotalSeqNo !== totalSeqNo && !isNaN(totalSeqNo)) {
       setTotalARB(totalARB)
-      localStorage.setItem('ess3aTotalARB', totalARB);
+      localStorage.setItem('ess3bTotalARB', totalARB);
     }
     // Save the totals in local storage
   };
@@ -545,13 +544,13 @@ export default function ThreeB() {
   
       try {
         
-          if(localStorageEss3aYesPossession != total  && possession == 'yes'){
-            localStorage.setItem('ess3aYesArbInPossession', total);
+          if(localStorageEss3bYesPossession != total  && possession == 'yes'){
+            localStorage.setItem('ess3bYesArbInPossession', total);
             
           }
       
-          if(localStorageEss3aNoPossession != total  && possession == 'no'){
-            localStorage.setItem('ess3aNoArbInPossession', total)
+          if(localStorageEss3bNoPossession != total  && possession == 'no'){
+            localStorage.setItem('ess3bNoArbInPossession', total)
             
           }
         
@@ -744,11 +743,11 @@ const ARBPossessionRawDatas = (datas, possession) => {
     if (!selectedFile) {
       return
     } else {
-      if (!selectedFile.name.includes("3A")) {
+      if (!selectedFile.name.includes("3b")) {
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: 'Please upload ESS 3A File only!',
+          text: 'Please upload ESS 3B File only!',
           confirmButtonText: 'OK',
           confirmButtonColor: '#053B50'
         })
@@ -815,7 +814,7 @@ const ARBPossessionRawDatas = (datas, possession) => {
               let currentTab = activeTab == 'north-cotabato' ? ess3BnorthCotData : activeTab == "sarangani" ? ess3BsaranganiData : activeTab == "south-cotabato" ? ess3BsouthCotData : activeTab == "sultan-kudarat" ? ess3BsultanKudaratData : ''
 
               if (currentTab.length > 1) {
-                const sql = `DELETE FROM suis.ess_3a_${activeTab.replace(/-/g, "_")}`;
+                const sql = `DELETE FROM suis.ess_3b_${activeTab.replace(/-/g, "_")}`;
                 console.log('SQL:', sql);
                 await deleteOldDatas(sql)
               }
@@ -837,7 +836,7 @@ const ARBPossessionRawDatas = (datas, possession) => {
                 const values = batch.flatMap((obj) => columns.map((col) => obj[col]));
 
 
-                const sql = `INSERT INTO suis.ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
+                const sql = `INSERT INTO suis.ess_3b_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
                 console.log('SQL:', sql);
                 console.log('values: ', values)
                 console.log('Batch Size:', batch.length);
@@ -926,14 +925,14 @@ const ARBPossessionRawDatas = (datas, possession) => {
                         // If none of the conditions match, values will be an empty array
 
                         if (currentTab.length > 1) {
-                          const sql = `DELETE FROM ess_3a_${activeTab.replace(/-/g, "_")}`;
+                          const sql = `DELETE FROM ess_3b_${activeTab.replace(/-/g, "_")}`;
                           console.log('SQL:', sql);
                           await deleteOldDatasOnline(sql)
 
                         }
                         let valuesColumnIndex = 1
                         const valuesColumn = onlineColumns.map(() => `$${valuesColumnIndex++}`).join(', ')
-                        const sqlOnline = `INSERT INTO ess_3a_${activeTab.replace(/-/g, "_")} (${onlineColumns}) VALUES (${valuesColumn})`;
+                        const sqlOnline = `INSERT INTO ess_3b_${activeTab.replace(/-/g, "_")} (${onlineColumns}) VALUES (${valuesColumn})`;
 
                         console.log("sqlOnline: ", sqlOnline)
                         console.log("sqlOnline values: ", values)

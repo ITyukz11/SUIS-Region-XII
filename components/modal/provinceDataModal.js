@@ -53,9 +53,10 @@ export default function ProvinceDataModal(props) {
                                         <tbody>
                                             {props.data && typeof props.data === 'object'
                                                 ? Object.entries(props.data).map(([property, value], index) => (
+                                                    
                                                     <tr key={index}  className={`border ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-grey-primary hover:cursor-pointer`}>
                                                         <td className="border p-2">{property}</td>
-                                                        <td className="border p-2">{value}</td>
+                                                        <td className="border p-2">{property=='Actual area of tillage/cultivation (in square meters)'?Number(value).toLocaleString():value}</td>
                                                     </tr>
                                                 ))
                                                 : <tr><td colSpan="2" className="border p-2">No data available</td></tr>}

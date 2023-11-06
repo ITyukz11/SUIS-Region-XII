@@ -22,7 +22,7 @@ export default function TableModal(props) {
   const { isLocalhost, isLaptop, getEss3ADatas, getEss3BDatas } = useDatas()
 
   const inputRef = useRef(null);
-
+console.log("islocalhost: ",isLocalhost)
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingStatus, setUploadingStatus] = useState(false)
@@ -376,48 +376,48 @@ export default function TableModal(props) {
 
               // Parse the CSV content
               const datas = [];
-
+console.log("fileName: ", fileName)
               csv({ separator: ',' }) // You can specify the separator here if it's not a comma
                 .on('data', (row) => {
                   const rowDataArray = Object.values(row);
-  
-                    const selectedData =  fileName=="3a"?
+                  
+                    const selectedData =  fileName==="3a"?
                     {  // Use the found index, or an empty string if not found
                       'start': rowDataArray[0],
                       'end': rowDataArray[1],
                       'today': rowDataArray[2],
                       'username': rowDataArray[3],
-                      'phonenumber': rowDataArray[5],
-                      'audit': rowDataArray[6],
-                      'audit_URL': rowDataArray[7],
-                      'Collective CLOA Sequence Number': rowDataArray[9],
-                      'OCT/TCT Number': rowDataArray[10],
-                      'Collective CLOA Number': rowDataArray[11],
-                      'First Name': rowDataArray[13],
-                      'Middle Name': rowDataArray[14],
-                      'Last Name': rowDataArray[15],
-                      'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
-                      'Is the ARB still in possession?': rowDataArray[18],
-                      'Gender': rowDataArray[23],
-                      'Educational Attainment': rowDataArray[46],
-                      'Civil Status': rowDataArray[47],
+                      'phonenumber': rowDataArray[4],
+                      'audit': rowDataArray[5],
+                      'audit_URL': rowDataArray[6],
+                      'Collective CLOA Sequence Number': rowDataArray[7],
+                      'OCT/TCT Number': rowDataArray[8],
+                      'Collective CLOA Number': rowDataArray[9],
+                      'First Name': rowDataArray[10],
+                      'Middle Name': rowDataArray[11],
+                      'Last Name': rowDataArray[12],
+                      'Actual area of tillage/cultivation (in square meters)': rowDataArray[13],
+                      'Is the ARB still in possession?': rowDataArray[14],
+                      'Gender': rowDataArray[15],
+                      'Educational Attainment': rowDataArray[16],
+                      'Civil Status': rowDataArray[17],
                     }: {  // Use the found index, or an empty string if not found
                       'start': rowDataArray[0],
                       'end': rowDataArray[1],
                       'today': rowDataArray[2],
                       'username': rowDataArray[3],
-                      'phonenumber': rowDataArray[5],
-                      'audit': rowDataArray[6],
-                      'Collective CLOA Sequence Number': rowDataArray[8],
-                      'OCT/TCT Number': rowDataArray[9],
-                      'Collective CLOA Number': rowDataArray[10],
-                      'First Name': rowDataArray[12],
-                      'Middle Name': rowDataArray[13],
-                      'Last Name': rowDataArray[14],
-                      'Actual area of tillage/cultivation (in square meters)': rowDataArray[19],
-                      'Gender': rowDataArray[16],
-                      'Educational Attainment': rowDataArray[37],
-                      'Civil Status': rowDataArray[48],
+                      'phonenumber': rowDataArray[4],
+                      'audit': rowDataArray[5],
+                      'Collective CLOA Sequence Number': rowDataArray[6],
+                      'OCT/TCT Number': rowDataArray[7],
+                      'Collective CLOA Number': rowDataArray[8],
+                      'First Name': rowDataArray[9],
+                      'Middle Name': rowDataArray[10],
+                      'Last Name': rowDataArray[11],
+                      'Actual area of tillage/cultivation (in square meters)': rowDataArray[12],
+                      'Gender': rowDataArray[13],
+                      'Educational Attainment': rowDataArray[14],
+                      'Civil Status': rowDataArray[15],
                     }
                   datas.push(selectedData);
 
@@ -505,13 +505,15 @@ export default function TableModal(props) {
                       }).then(() => {
                         // Perform any actions you need after all batches are done
                         if (completedLocalBatches === batches.length) {
-                          handlesSuccessToastMessage("Successfully uploaded locally!")     
-                          if(fileName=="3A"){
-                            getEss3ADatas(); // Restart the table   
+                          handlesSuccessToastMessage("Successfully uploaded locally!")  
+                          getEss3ADatas();   
+                          getEss3BDatas()
+                          // if(fileName=="3A"){
+                          //   getEss3ADatas(); // Restart the table   
 
-                          }else{
-                            getEss3BDatas()
-                          }
+                          // }else{
+                          //   getEss3BDatas()
+                          // }
                           
                           console.log("ALL BATCHES LOCALLY");
                         }

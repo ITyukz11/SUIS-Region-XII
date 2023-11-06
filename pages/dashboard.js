@@ -49,7 +49,7 @@ export default function dashboard() {
           <div className={overviewCss}>
             <h1 className='font-bold text-2xl'>CCIS</h1>
           </div>
-          <div className={`${overviewCss} border-r-2 border-l-2 border-black`}>
+          <div className={`${overviewCss}`}>
             <h1 className='font-bold text-2xl'>Monitoring & Evaluation</h1>
           </div>
           <Link href='/ess/3a' className={`${overviewCss} cursor-pointer hover:bg-grey-primary`}  >
@@ -60,44 +60,8 @@ export default function dashboard() {
         </div>
         <div className='flex flex-row justify-center gap-5'>
           <div className={containerOverviewCss}>
-            GLOBAL TARGET registered as of today
           </div>
-          <div className={containerOverviewCss}>
-          </div>
-         
-          <div className={`flex flex-col justify-around ${containerOverviewCss}` }>
-            <div className='h-full hover:bg-grey-primary cursor-pointer'>
-              <label>Overall</label>
-              <div className='flex flex-row justify-center gap-5 h-full'>
-                {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageEss3ATotalSeqNo == undefined ? 0 : localStorageEss3ATotalSeqNo)}
-                {overviewData(<MdMap />, 'Area:', localStorageEss3ATotalArea == undefined ? 0 : localStorageEss3ATotalArea)}
-                {overviewData(<MdFace6 />, 'Male:', localStorageEss3ATotalMale == undefined ? 0 : localStorageEss3ATotalMale)}
-                {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? 0 : localStorageEss3ATotalFemale)}
-                {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? 0 : localStorageEss3ATotalARB)}
-              </div>
-            </div>
-            <div className='h-full border-t-2 border-b-2 hover:bg-grey-primary cursor-pointer'>
-              <label>ESMF 3A</label>
-              <div className='flex flex-row justify-center gap-5'>
-                {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageEss3ATotalSeqNo == undefined ? 0 : localStorageEss3ATotalSeqNo)}
-                {overviewData(<MdMap />, 'Area:', localStorageEss3ATotalArea == undefined ? 0 : localStorageEss3ATotalArea)}
-                {overviewData(<MdFace6 />, 'Male:', localStorageEss3ATotalMale == undefined ? 0 : localStorageEss3ATotalMale)}
-                {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? 0 : localStorageEss3ATotalFemale)}
-                {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? 0 : localStorageEss3ATotalARB)}
-              </div>
-            </div>
-
-            <div className='h-full hover:bg-grey-primary cursor-pointer'>
-              <label>ESMF 3B</label>
-              <div className='flex flex-row justify-center gap-5'>
-                {overviewData(<MdFormatListNumbered />, 'SeqNo:', localStorageEss3ATotalSeqNo == undefined ? 0 : localStorageEss3ATotalSeqNo)}
-                {overviewData(<MdMap />, 'Area:', localStorageEss3ATotalArea == undefined ? 0 : localStorageEss3ATotalArea)}
-                {overviewData(<MdFace6 />, 'Male:', localStorageEss3ATotalMale == undefined ? 0 : localStorageEss3ATotalMale)}
-                {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? 0 : localStorageEss3ATotalFemale)}
-                {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? 0 : localStorageEss3ATotalARB)}
-              </div>
-            </div>
-          </div>
+        
           
         </div>
       </div>

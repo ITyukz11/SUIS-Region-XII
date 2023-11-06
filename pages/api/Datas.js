@@ -6,7 +6,7 @@ const Datas = createContext();
 
 export function DatasProvider({ children }) {
       //CHECK IF LOCALHOST OR ONLINE
-  const isLocalhost = process.env.NEXT_PUBLIC_URL.includes('localhost');
+  const isLocalhost = true //process.env.NEXT_PUBLIC_URL.includes('localhost');
     //Define the pronvinces 
     const provinces = ['north-cotabato', 'sarangani', 'south-cotabato', 'sultan-kudarat'];
 
@@ -57,18 +57,19 @@ export function DatasProvider({ children }) {
     const [isLaptop, setIsLaptop] = useState(false)
 
     async function getEss3ADatas() {
-        const postData = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        };
+      const postData = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     
-        provinces.forEach(async (province) => {
+      provinces.forEach(async (province) => {
+        try {
           const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}`, postData);
           const response = await res.json();
           if (!response.error) {
-            switch (province) { // Use `province` instead of `provinces[index]`
+            switch (province) {
               case 'north-cotabato':
                 setEss3ANorthCotData(response);
                 break;
@@ -85,9 +86,19 @@ export function DatasProvider({ children }) {
                 break;
             }
             console.log(`response for ${province}: `, response);
+          } else {
+            // Handle the case when the response contains an error
+            console.log(`Failed to fetch data for ${province}`);
+            // You can set the data to an empty array or handle it as needed
           }
-        });
-      }
+        } catch (error) {
+          // Handle the fetch error here
+          console.error(`Error fetching data for ${province} URL: ${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}, postData `, error);
+          // Set the data to an empty array or handle it as needed
+        }
+      });
+    }
+    
         //FOR ONLINE 
   async function getEss3ADatasTest2() {
     const postData = {
@@ -97,9 +108,10 @@ export function DatasProvider({ children }) {
       }
     };
     const provinces = ['test-north-cotabato', 'test-sarangani', 'test-south-cotabato', 'test-sultan-kudarat'];
-
+    
     provinces.forEach(async (province) => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}`, postData);
+      //online
       const response = await res.json();
       if (!response.error) {
         switch (province) { // Use `province` instead of `provinces[index]`
@@ -137,31 +149,42 @@ export function DatasProvider({ children }) {
         "Content-Type": "application/json"
       }
     };
-
+  
     provinces.forEach(async (province) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3b/${province}`, postData);
-      const response = await res.json();
-      if (!response.error) {
-        switch (province) { // Use `province` instead of `provinces[index]`
-          case 'north-cotabato':
-            setEss3BNorthCotData(response);
-            break;
-          case 'sarangani':
-            setEss3BSaranganiData(response); 
-            break;
-          case 'south-cotabato':
-            setEss3BSouthCotData(response);
-            break;
-          case 'sultan-kudarat':
-            setEss3BSultanKudaratData(response);
-            break;
-          default:
-            break;
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ess/3b/${province}`, postData);
+        const response = await res.json();
+        if (!response.error) {
+          switch (province) {
+            case 'north-cotabato':
+              setEss3BNorthCotData(response);
+              break;
+            case 'sarangani':
+              setEss3BSaranganiData(response);
+              break;
+            case 'south-cotabato':
+              setEss3BSouthCotData(response);
+              break;
+            case 'sultan-kudarat':
+              setEss3BSultanKudaratData(response);
+              break;
+            default:
+              break;
+          }
+          console.log(`response for ${province}: `, response);
+        } else {
+          // Handle the case when the response contains an error
+          console.log(`Failed to fetch data for ${province}`);
+          // Set the data to an empty array or handle it as needed
         }
-        console.log(`response for ${province}: `, response);
+      } catch (error) {
+        // Handle the fetch error here
+        console.error(`Error fetching data for ${province}: `, error);
+        // Set the data to an empty array or handle it as needed
       }
     });
   }
+  
     //FOR ONLINE 
 async function getEss3BDatasTest2() {
 const postData = {
@@ -231,25 +254,33 @@ provinces.forEach(async (province) => {
             getEss3ADatas()
             getEss3BDatas()
         } else {
-            getEss3ADatasTest2()
-            getEss3BDatasTest2()
+            // getEss3ADatasTest2()
+            // getEss3BDatasTest2()
         }
     }, []);
 
-    useEffect(() => {
-        setLocalStorageEss3ATotalSeqNo(localStorage.getItem('ess3aTotalSeqNo'))
-        setLocalStorageEss3ATotalArea(localStorage.getItem('ess3aTotalArea'))
-        setLocalStorageEss3ATotalMale(localStorage.getItem('ess3aTotalMale'))
-        setLocalStorageEss3ATotalFemale(localStorage.getItem('ess3aTotalFemale'))
-        setLocalStorageEss3ATotalARB(localStorage.getItem('ess3aTotalARB'))
-        setLocalStorageEss3aYesPossession(localStorage.getItem('ess3aYesArbInPossession'))
-        setLocalStorageEss3aNoPossession(localStorage.getItem('ess3aNoArbInPossession'))
+  useEffect(() => {
+    //3a
+    setLocalStorageEss3ATotalSeqNo(localStorage.getItem('ess3aTotalSeqNo'))
+    setLocalStorageEss3ATotalArea(localStorage.getItem('ess3aTotalArea'))
+    setLocalStorageEss3ATotalMale(localStorage.getItem('ess3aTotalMale'))
+    setLocalStorageEss3ATotalFemale(localStorage.getItem('ess3aTotalFemale'))
+    setLocalStorageEss3ATotalARB(localStorage.getItem('ess3aTotalARB'))
+    setLocalStorageEss3aYesPossession(localStorage.getItem('ess3aYesArbInPossession'))
+    setLocalStorageEss3aNoPossession(localStorage.getItem('ess3aNoArbInPossession'))
 
-        setLocalStorageEss3AnorthCotData(localStorage.getItem('ess3aNorthCot'))
-        setLocalStorageEss3AsaranganiData(localStorage.getItem('ess3aSarangani'))
-        setLocalStorageEss3AsoutCotData(localStorage.getItem('ess3aSoutCot'))
-        setLocalStorageEss3AsultanKudaratData(localStorage.getItem('ess3aSultanKudarat'))
-        
+    setLocalStorageEss3AnorthCotData(localStorage.getItem('ess3aNorthCot'))
+    setLocalStorageEss3AsaranganiData(localStorage.getItem('ess3aSarangani'))
+    setLocalStorageEss3AsoutCotData(localStorage.getItem('ess3aSoutCot'))
+    setLocalStorageEss3AsultanKudaratData(localStorage.getItem('ess3aSultanKudarat'))
+    //3b
+    setLocalStorageEss3BnorthCotData(localStorage.getItem('ess3bNorthCot'))
+    setLocalStorageEss3BsaranganiData(localStorage.getItem('ess3bSarangani'))
+    setLocalStorageEss3BsoutCotData(localStorage.getItem('ess3bSoutCot'))
+    setLocalStorageEss3BsultanKudaratData(localStorage.getItem('ess3bSultanKudarat'))
+
+    
+
       }, []);
 
     return (
