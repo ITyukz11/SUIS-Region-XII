@@ -11,9 +11,13 @@ module.exports = {
         "blue-primary":"#176B87",
         "teal-primary":"#64CCC5",
         "grey-primary":"#EEEEEE",
-        "login-primary":"#01091C",
-        "light-primary":"#F0F2F5"
 
+        "login-primary":"#01091C",
+        "light-primary":"#F0F2F5",
+
+        "ccis-primary":"#2F5597",
+        "mne-primary":"#f8ba57",
+        "ess-primary":"#8d9f85",
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -29,5 +33,7 @@ module.exports = {
       'full': '100%',
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwindcss-inner-border")
+  ],
 }
