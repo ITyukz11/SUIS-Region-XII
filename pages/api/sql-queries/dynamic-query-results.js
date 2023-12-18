@@ -1,7 +1,7 @@
 // pages/api/test-db-connection.js
 
-import { testDatabaseConnection } from "../../../../lib/db";
-import { query } from "../../../../lib/db"; // Import your query function
+import { query, testDatabaseConnection } from "../../../lib/db";
+
 
 export default async function handler(req, res) {
   await testDatabaseConnection();
@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     try {
         try {
           const essNorthCot = await query({
-            query: 'SELECT * FROM suis.ess_3a_south_cotabato',
+            query: 'SELECT * FROM suis.dynamic_query_results',
             values: [],
           });
 
@@ -31,17 +31,17 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     const { sql, values } = req.body;
-
+  
     try {
       let result;
-
-      if (values == []) {
+  
+      if (values && values.length > 0) {
         // Execute the query with values
         await query({
           query: sql,
           values: values,
         });
-
+  
         result = { message: "Success" };
       } else {
         // Execute the query without values
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
           values: [],  // You may need to adjust this based on your query
         });
       }
-
+  
       const prettyJSON = JSON.stringify(result, null, 2);
       res.status(200).send(prettyJSON); // Send the pretty-printed JSON as a response
     } catch (error) {
@@ -59,6 +59,7 @@ export default async function handler(req, res) {
       res.status(500).json({ error: "Internal Server Error: " + error.message });
     }
   }
+  
   
   
 }

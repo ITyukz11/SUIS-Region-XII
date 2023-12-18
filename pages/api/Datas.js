@@ -7,16 +7,20 @@ const Datas = createContext();
 export function DatasProvider({ children }) {
       //CHECK IF LOCALHOST OR ONLINE
   const isLocalhost = true //process.env.NEXT_PUBLIC_URL.includes('localhost');
+   
+  //SQL SCRIPTS
+  const[sqlQueryScripts, setSqlQueryScripts] = useState([]);
     //Define the pronvinces 
     const provinces = ['north-cotabato', 'sarangani', 'south-cotabato', 'sultan-kudarat'];
+
+    //DYNAMIC QUERIES
+    const [dynamicQueryResultsData, setDynamicQueryResultsData] = useState([])
 
     //ESS 3A
     const [ess3AnorthCotData, setEss3ANorthCotData] = useState([]);
     const [ess3AsaranganiData, setEss3ASaranganiData] = useState([]);
     const [ess3AsouthCotData, setEss3ASouthCotData] = useState([]);
     const [ess3AsultanKudaratData, setEss3ASultanKudaratData] = useState([]);
-
-
 
     const [localStorageEss3ATotalSeqNo, setLocalStorageEss3ATotalSeqNo] = useState()
     const [localStorageEss3ATotalArea, setLocalStorageEss3ATotalArea] = useState()
@@ -50,11 +54,50 @@ export function DatasProvider({ children }) {
     const [localStorageEss3BsoutCotData, setLocalStorageEss3BsoutCotData] = useState()
     const [localStorageEss3BsultanKudaratData, setLocalStorageEss3BsultanKudaratData] = useState()
 
-
-
-
     const [isMobile, setIsMobile] = useState(false)
     const [isLaptop, setIsLaptop] = useState(false)
+
+    async function getSqlScriptsDatas(){
+      const postData = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+    
+    
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/sql-query-scripts`, postData);
+          const response = await res.json();
+          setSqlQueryScripts(response)
+        } catch (error) {
+          // Handle the fetch error here
+          console.error(`${process.env.NEXT_PUBLIC_URL}/api/sql-query-scripts`, postData, error);
+          // Set the data to an empty array or handle it as needed
+        }
+    
+    }
+
+    async function getSqlDynamicQueryResultsDatas(){
+      const postData = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+    
+    
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/sql-queries/dynamic-query-results`, postData);
+          const response = await res.json();
+          setDynamicQueryResultsData(response)
+        } catch (error) {
+          // Handle the fetch error here
+          console.error(`${process.env.NEXT_PUBLIC_URL}/api/sql-queries/dynamic-query-results`, postData, error);
+          // Set the data to an empty array or handle it as needed
+        }
+    
+    }
 
     async function getEss3ADatas() {
       const postData = {
@@ -184,6 +227,32 @@ export function DatasProvider({ children }) {
       }
     });
   }
+
+  async function getSqlQueryScripts(){
+    const postData = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+  
+  
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/sql-query-scripts`, postData);
+        const response = await res.json();
+        if (!response.error) {
+          setSqlQueryScripts(response)
+          console.log(`response: `, response);
+        } else {
+          console.error(`Error fetching data for sql-query-scripts!`);
+        }
+      } catch (error) {
+        // Handle the fetch error here
+        console.error(`Error fetching data for sql-query-scripts: `, error);
+        // Set the data to an empty array or handle it as needed
+      }
+ 
+  }
   
     //FOR ONLINE 
 async function getEss3BDatasTest2() {
@@ -253,6 +322,8 @@ provinces.forEach(async (province) => {
         if (isLocalhost) {
             getEss3ADatas()
             getEss3BDatas()
+            getSqlScriptsDatas()
+            getSqlDynamicQueryResultsDatas()
         } else {
             // getEss3ADatasTest2()
             // getEss3BDatasTest2()
@@ -286,6 +357,8 @@ provinces.forEach(async (province) => {
     return (
         <Datas.Provider
             value={{
+              getSqlScriptsDatas,
+                sqlQueryScripts,
                 isLocalhost,
                 isMobile,
                 isLaptop,
@@ -312,6 +385,9 @@ provinces.forEach(async (province) => {
                 localStorageEss3BsoutCotData,
                 localStorageEss3BsultanKudaratData,
 
+                getSqlDynamicQueryResultsDatas,
+                dynamicQueryResultsData,
+
                 getEss3ADatas,
                 ess3AnorthCotData,
                 ess3AsaranganiData,
@@ -322,8 +398,7 @@ provinces.forEach(async (province) => {
                 ess3BnorthCotData,
                 ess3BsaranganiData,
                 ess3BsouthCotData,
-                ess3BsultanKudaratData,
-
+                ess3BsultanKudaratData,            
             }}>
             {children}
         </Datas.Provider>

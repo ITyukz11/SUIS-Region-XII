@@ -19,6 +19,10 @@ import {
     MdMenu,
     MdBrowserUpdated,
     MdBook,
+    MdQueryStats,
+    MdDataObject,
+    MdOutlineQueryStats,
+    MdViewAgenda,
 
 } from "react-icons/md";
 import Link from "next/link";
@@ -27,16 +31,26 @@ import HelpModal from "./modal/helpmodal";
 import Suis from "./modal/suismodal";
 import Image from "next/image";
 import { useDatas } from "../pages/api/Datas";
-
+import UploadCCISModal from "./ccis/modal/uploadccismodal";
+import { motion, useScroll, useSpring } from "framer-motion";
 
 export default function Layout({ children }) {
-    const { dashboardActive,
+    const {
+        dashboardActive,
+        sqlQueryActive,
         prActive,
         ccisActive,
         essisActive,
+
+        sqlQueryActiveSubMenu,
         prActiveSubMenu,
         ccisActiveSubMenu,
         essisActiveSubMenu,
+
+        sqlViewSqlQuery,
+        sqlQuery,
+
+        sqlQueriesSubMenu,
         prSubmenu,
         ccisSubmenu,
         essisSubmenu,
@@ -49,13 +63,23 @@ export default function Layout({ children }) {
     const [helpIsOpen, setHelpIsOpen] = useState(false);
     const [suisIsOpen, setSuisIsOpen] = useState(false);
 
+    const [ccisUploadModalOpen, setCcisUploadModalOpen] = useState(false)
+
     const [currentImage, setCurrentImage] = useState('/images/SUIS-Logo.png');
     const alternateImage = '/images/RPS-Logo.png';
     const [isImageFading, setIsImageFading] = useState(false);
 
-    const {isMobile, isLaptop} = useDatas()
+    const { isMobile, isLaptop } = useDatas()
 
-    useEffect(() => {   
+    const { scrollYProgress } = useScroll();
+    const scaleX = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
+
+
+    useEffect(() => {
         const intervalId = setInterval(() => {
             setIsImageFading(true); // Trigger the fade-out effect
             setTimeout(() => {
@@ -70,16 +94,20 @@ export default function Layout({ children }) {
     return (
         <div className="flex flex-col justify-center items-center min-h-screen ">
             <header className="bg-navy-primary text-grey-primary fixed top-0 left-0 right-0 h-14 flex items-center justify-center font-bold uppercase overflow-hidden z-10">
-            <MdMenu className="text-5xl p-2 absolute bg-transparent w-fit text-grey-primary rounded-full left-1 top-1 cursor-pointer border-grey-primary border-solid hover:border-2 " onClick={toggleDisclosure} />
-            
-             <div className="flex items-center text-center">
-             <Image className={`${isMobile?'ml-10':''}`} src='/images/SUIS-Logo.png' height={50} width={50} alt="SUIS Logo" />
-                <label className={`${isMobile?'text-xs':'text-2xl'} xl:text-2xl lg:text-xl md:text-lg sm:text-xs`}>SPLIT UNIFIED INFORMATION SYSTEM - BETA</label>
-             </div>
-   
-            
-         
+                <MdMenu className="text-5xl p-2 absolute bg-transparent w-fit text-grey-primary rounded-full left-1 top-1 cursor-pointer border-grey-primary border-solid hover:border-2 " onClick={toggleDisclosure} />
+
+                <div className="flex items-center text-center">
+                    <Image className={`${isMobile ? 'ml-10' : ''}`} src='/images/SUIS-Logo.png' height={50} width={50} alt="SUIS Logo" />
+                    <label className={`${isMobile ? 'text-xs' : 'text-2xl'} xl:text-2xl lg:text-xl md:text-lg sm:text-xs`}>SPLIT UNIFIED INFORMATION SYSTEM - BETA</label>
+                </div>
             </header>
+            <motion.div
+                className="h-2 bg-blue-600 fixed top-14 left-0 right-0 z-10"
+                style={{ scaleX: scaleX }}
+            />
+
+
+
 
             <div className="flex flex-col md:flex-row flex-1 w-[100%] justify-center">
                 {disclosureOpen ? (
@@ -113,6 +141,56 @@ export default function Layout({ children }) {
                                         </h3>
                                     </div>
                                 </Link>
+
+                                {/**SQL QUERIES */}
+                                <div className={`flex justify-between mb-2 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-200 ${ccisActive && ccisActiveSubMenu ? 'bg-gray-900 p-2 rounded-md group cursor-pointer shadow-lg m-auto' : ''}`}
+                                    onClick={() => { menuActive(5); sqlQueriesSubMenu() }}>
+                                    <MdAssessment className={`right-0 text-2xl text-gray-600 group-hover:text-white ${sqlQueryActive && sqlQueryActiveSubMenu ? 'text-white' : 'text-grey-primary'}`} />
+                                    <h3 className={`text-base text-grey-primary group-hover:text-white font-semibold ${sqlQueryActive && sqlQueryActiveSubMenu ? 'text-white font-semibold' : 'text-grey-primary'}`}>
+                                        <span className="pl-4">SQL QUERIES</span>
+                                    </h3>
+                                    <MdChevronRight
+                                        className={`ml-auto font-extrabold text-2xl text-grey-primary group-hover:text-white ${sqlQueryActiveSubMenu
+                                            ? 'transform rotate-90 transition-transform duration-200 delay-100'
+                                            : 'text-gray-900 transform rotate-0 transition-transform duration-200 delay-100'
+                                            } ${sqlQueryActive ? 'text-white' : 'text-grey-primary'}`} />
+
+
+                                </div>
+
+                                {/**SQL QUERIES */}
+                                <Transition
+                                    show={sqlQueryActiveSubMenu}
+                                    enter="transition duration-100 ease-out"
+                                    enterFrom="transform scale-95 opacity-0"
+                                    enterTo="transform scale-100 opacity-100"
+                                    leave="transition duration-75 ease-out"
+                                    leaveFrom="transform scale-100 opacity-100"
+                                    leaveTo="transform scale-95 opacity-0">
+                                    <Disclosure.Panel>
+                                        <ul id="sql-submenu">
+                                            <Link href='/query/sql-query'>
+                                                <li className={`flex mb-2 justify-start items-center gap-2 pl-10 hover:bg-slate-500 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-300 hover:translate-x-3
+                                                ${sqlQuery ? 'bg-slate-500 shadow-lg translate-x-3' : ''}`} onClick={() => subMenuActive(13)}>
+                                                    <MdOutlineQueryStats className=" text-grey-primary group-hover:text-white font-semibold" />
+                                                    <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold">Query</h5>
+                                                </li>
+                                            </Link>
+                                            <Link href='/query/view-query'>
+                                                <li className={`flex mb-2 justify-start items-center gap-2 pl-10 hover:bg-slate-500 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-300 hover:translate-x-3
+                                                ${sqlViewSqlQuery ? 'bg-slate-500 shadow-lg translate-x-3' : ''}`} onClick={() => subMenuActive(14)}>
+                                                    <MdViewAgenda className=" text-grey-primary group-hover:text-white font-semibold" />
+                                                    <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold ">View Datas</h5>
+                                                </li>
+                                            </Link>
+
+                                        </ul>
+
+                                    </Disclosure.Panel>
+                                </Transition>
+
+
+
                                 {/**PROVINCIAL REPORT */}
                                 <div className={`flex justify-between mb-2 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-200 ${prActive && prActiveSubMenu ? 'bg-gray-900 p-2 rounded-md group cursor-pointer shadow-lg m-auto' : ''}`}
                                     onClick={() => { menuActive(2); prSubmenu() }}>
@@ -127,6 +205,7 @@ export default function Layout({ children }) {
                                             } ${prActive ? 'text-white' : 'text-grey-primary'}`} />
 
                                 </div>
+
 
                                 {/* Conditionally render the submenu with the transition effect */}
 
@@ -201,6 +280,11 @@ export default function Layout({ children }) {
                                 >
                                     <Disclosure.Panel>
                                         <ul id="ccis-submenu">
+                                            <li className="flex mb-2 justify-start items-center gap-2 pl-10 hover:bg-slate-500 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-300 hover:translate-x-3"
+                                                onClick={() => setCcisUploadModalOpen(true)}>
+                                                <MdUploadFile className=" text-grey-primary group-hover:text-white font-semibold" />
+                                                <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold">Upload CCIS File</h5>
+                                            </li>
                                             <li className="flex mb-2 justify-start items-center gap-2 pl-10 hover:bg-slate-500 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-300 hover:translate-x-3">
                                                 <MdLandscape className=" text-grey-primary group-hover:text-white font-semibold" />
                                                 <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold">Field Validation</h5>
@@ -275,6 +359,7 @@ export default function Layout({ children }) {
                                                     <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold ">3B</h5>
                                                 </li>
                                             </Link>
+
                                         </ul>
 
                                     </Disclosure.Panel>
@@ -323,8 +408,9 @@ export default function Layout({ children }) {
             </div>
             <footer className="bg-navy-primary text-grey-primary fixed bottom-0 left-0 right-0 h-10 flex justify-center items-center font-bold uppercase text-center">
                 <Image src='/images/RPS-Logo.png' height={50} width={50} alt="RPS Logo" />
-               <label className={`${isMobile?'text-xs':'text-2xl'} xl:text-2xl lg:text-xl md:text-lg sm:text-xs`}>© 2023 - Regional Planning Section</label> 
+                <label className={`${isMobile ? 'text-xs' : 'text-2xl'} xl:text-2xl lg:text-xl md:text-lg sm:text-xs`}>© 2023 - Regional Planning Section</label>
             </footer>
+            <UploadCCISModal isOpen={ccisUploadModalOpen} isClose={() => setCcisUploadModalOpen(!ccisUploadModalOpen)} />
         </div>
     );
 }

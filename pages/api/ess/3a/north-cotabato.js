@@ -29,18 +29,32 @@ export default async function handler(req, res) {
     }
   }
 
-  if (req.method === "POST") {
+ if (req.method === "POST") {
     const { sql, values } = req.body;
+
     try {
-      await query({
-        query: sql,
-        values: values,
-      });
-  
-      // If no error is thrown, consider the operation successful
-      res.status(201).json({ message: "Success" });
+      let result;
+
+      if (values == []) {
+        // Execute the query with values
+        await query({
+          query: sql,
+          values: values,
+        });
+
+        result = { message: "Success" };
+      } else {
+        // Execute the query without values
+        result = await query({
+          query: sql,
+          values: [],  // You may need to adjust this based on your query
+        });
+      }
+
+      const prettyJSON = JSON.stringify(result, null, 2);
+      res.status(200).send(prettyJSON); // Send the pretty-printed JSON as a response
     } catch (error) {
-      console.error("Error inserting data:", error);
+      console.error("Error executing query:", error);
       console.error("Values:", values);
       res.status(500).json({ error: "Internal Server Error: " + error.message });
     }

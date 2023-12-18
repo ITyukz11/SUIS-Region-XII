@@ -10,15 +10,19 @@ export function MenuProvider({ children }) {
     const [prActive, setPrActive] = useState(false);
     const [ccisActive, setCcisActive] = useState(false);
     const [essisActive, setEssisactive] = useState(false);
+    const [sqlQueryActive, setSqlQueryActive] = useState(false)
 
     //SubMenus
+    const [sqlQueryActiveSubMenu, setSqlQueryActiveSubMenu] = useState(false);
     const [prActiveSubMenu, setPrActiveSubMenu] = useState(false);
     const [ccisActiveSubMenu, setCcisActiveSubMenu] = useState(false);
     const [essisActiveSubMenu, setEssisActiveSubMenu] = useState(false);
-
+    
     //SubMenus Active
     const [essThreeA, setEssThreeA] = useState(false);
     const [essThreeB, setEssThreeB] = useState(false);
+    const [sqlQuery, setSqlQuery] = useState(false);
+    const [sqlViewSqlQuery ,setSqlViewSqlQuery]= useState(false)
 
     //Track the state of the Disclosure
     const [disclosureOpen, setDisclosureOpen] = useState(false);
@@ -67,6 +71,9 @@ export function MenuProvider({ children }) {
                 //SubMenu Actives
                 setEssThreeA(false);
                 setEssThreeB(false);
+
+                setSqlViewSqlQuery(false)
+                setSqlQuery(false)
                 console.log(menu)
                 break;
             case 2:
@@ -74,6 +81,9 @@ export function MenuProvider({ children }) {
                 setPrActive(true);
                 setCcisActive(false);
                 setEssisactive(false);
+
+                setSqlViewSqlQuery(false)
+                setSqlQuery(false)
 
                 //SubMenu Actives
                 setEssThreeA(false);
@@ -86,20 +96,43 @@ export function MenuProvider({ children }) {
                 setCcisActive(true);
                 setEssisactive(false);
 
+                setSqlViewSqlQuery(false)
+                setSqlQuery(false)
+
                 //SubMenu Actives
                 setEssThreeA(false);
                 setEssThreeB(false);
                 console.log(menu)
                 break;
-            case 4:
+            case 4: //ESS ACTIVE
                 setDashboardActive(false);
                 setPrActive(false);
                 setCcisActive(false);
                 setEssisactive(true);
+                
+           
+                setSqlQuery(false)
+
+
+                console.log(menu)
+                break;  
+            case 5: //SQL QUERY TRUE
+                setDashboardActive(false);
+                setPrActive(false);
+                setCcisActive(false);
+                setEssisactive(false);
+            
+
+           
+
+                   //SubMenu Actives
+                   setEssThreeA(false);
+                   setEssThreeB(false);
                 console.log(menu)
                 break;    
             default:
                 break;
+            
         }
     };
     const subMenuActive =(submenu) => {
@@ -107,16 +140,49 @@ export function MenuProvider({ children }) {
             case 11:
                 setEssThreeA(true);
                 setEssThreeB(false);
+
+                setDashboardActive(false);
+
+                setSqlQueryActive(false)
+                setSqlViewSqlQuery(false)
                 console.log(submenu)
                 break;
             case 12:
                 setEssThreeA(false);
                 setEssThreeB(true);
+
+                setDashboardActive(false);
+
+                setSqlQueryActive(false)
+                setSqlViewSqlQuery(false)
                 console.log(submenu)
-                break;
+                break;  
+            case 13:
+                setEssThreeA(false);
+                setEssThreeB(false);
+
+                setDashboardActive(false);
+
+                setSqlQuery(true)
+                setSqlViewSqlQuery(false)
+                console.log(submenu)
+                break;    
+            case 14:
+                setEssThreeA(false);
+                setEssThreeB(false);
+
+                setDashboardActive(false);
+
+                setSqlQuery(false)
+                setSqlViewSqlQuery(true)
+                console.log(submenu)
+                break;            
             default:
                 break;
         }
+    }
+    const sqlQueriesSubMenu = () =>{
+        setSqlQueryActiveSubMenu(!sqlQueryActiveSubMenu);
     }
     const prSubmenu = () =>{
         setPrActiveSubMenu(!prActiveSubMenu);
@@ -141,15 +207,21 @@ export function MenuProvider({ children }) {
                 prActive,
                 ccisActive,
                 essisActive,
+                sqlQueryActive,
 
+                sqlQueryActiveSubMenu,
                 prActiveSubMenu,
-                ccisActiveSubMenu,
+                ccisActiveSubMenu,  
                 essisActiveSubMenu,
+
+                sqlQuery,
+                sqlViewSqlQuery,
 
                 essThreeA,
                 essThreeB,
 
                 disclosureOpen,
+                sqlQueriesSubMenu,
                 prSubmenu,
                 ccisSubmenu,
                 essisSubmenu,

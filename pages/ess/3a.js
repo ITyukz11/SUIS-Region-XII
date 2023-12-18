@@ -23,7 +23,6 @@ export default function ThreeA() {
     localStorageEss3ATotalFemale,
     localStorageEss3ATotalARB,
     localStorageEss3aYesPossession, localStorageEss3aNoPossession,
-    localStorageEss3AnorthCotData,localStorageEss3AsaranganiData,localStorageEss3AsoutCotData,localStorageEss3AsultanKudaratData,
     getEss3ADatas, ess3AnorthCotData, ess3AsaranganiData, ess3AsouthCotData, ess3AsultanKudaratData } = useDatas();
 
 
@@ -62,9 +61,11 @@ export default function ThreeA() {
   const [provinceArb, setProvinceArb] = useState('')
   const [provinceImage, setProvinceImage] =useState('')
 
+  const [showProvincialDatas, setShowProvincialDatass] = useState(false)
+
   const inputRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState(''); // Initialize with the index of the default active tab NOT WORKING, I created tabIndex instead
+  const [activeTab, setActiveTab] = useState('north-cotabato'); // Initialize with the index of the default active tab NOT WORKING, I created tabIndex instead
   const [tabIndex, setTabIndex] = useState(0)
   //Getting the error message from api
   const [errorPostReq, setErrorPostReq] = useState('')
@@ -772,22 +773,20 @@ const ARBPossessionRawDatas = (datas, possession) => {
                   const selectedData = {  // Use the found index, or an empty string if not found
                     'start': rowDataArray[0],
                     'end': rowDataArray[1],
-                    'today': rowDataArray[2],
-                    'username': rowDataArray[3],
-                    'phonenumber': rowDataArray[5],
-                    'audit': rowDataArray[6],
-                    'audit_URL': rowDataArray[7],
-                    'Collective CLOA Sequence Number': rowDataArray[9],
-                    'OCT/TCT Number': rowDataArray[10],
-                    'Collective CLOA Number': rowDataArray[11],
-                    'First Name': rowDataArray[13],
-                    'Middle Name': rowDataArray[14],
-                    'Last Name': rowDataArray[15],
-                    'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
-                    'Is the ARB still in possession?': rowDataArray[18],
-                    'Gender': rowDataArray[23],
-                    'Educational Attainment': rowDataArray[46],
-                    'Civil Status': rowDataArray[47],
+                    'username': rowDataArray[2],
+                    'phonenumber': rowDataArray[3],
+                    'Collective CLOA Sequence Number': rowDataArray[4],
+                    'OCT/TCT Number': rowDataArray[5],
+                    'Collective CLOA Number': rowDataArray[6],
+                    'First Name': rowDataArray[7],
+                    'Middle Name': rowDataArray[8],
+                    'Last Name': rowDataArray[9],
+                    'Lot # of the actual area of tillage/cultivation (based on the Approved Subdivision Plan if available)':rowDataArray[10],
+                    'Actual area of tillage/cultivation (in square meters)': rowDataArray[11],
+                    'Is the ARB still in possession?': rowDataArray[12],
+                    'Gender': rowDataArray[13],
+                    'Educational Attainment': rowDataArray[14],
+                    'Civil Status': rowDataArray[15],
                   };
                   datas.push(selectedData);
                 })
@@ -819,23 +818,41 @@ const ARBPossessionRawDatas = (datas, possession) => {
               }
 
               for (const batch of batches) {
+                const dateNow = new Date();
+                const formattedDate = dateNow.toLocaleString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hour12: true,
+                });
+
+
                 const columns = Object.keys(batch[0]); // Assuming all objects have the same keys
                 const columnsWithDoubleQuote = columns.map((column) => `"${column}"`);
+                // const placeholders = batch
+                //   .map(() =>
+                //     `(${columns.map(() => `$${parameterIndex++}`).join(', ')})`
+                //   )
+                //   .join(', ');
                 const placeholders = batch
                   .map(() =>
-                    `(${columns.map(() => `$${parameterIndex++}`).join(', ')})`
-                  )
-                  .join(', ');
+                      `(${columns.map(() => `$${parameterIndex++}`).join(', ')}, $${parameterIndex++})`
+                        )
+                        .join(', ');
 
                 // Reset the parameterIndex to 1 when it reaches 100
                 if (parameterIndex > 100) {
                   parameterIndex = 1;
                 }
 
-                const values = batch.flatMap((obj) => columns.map((col) => obj[col]));
+              //const values = batch.flatMap((obj) => columns.map((col) => obj[col]));
+                const values = batch.flatMap((obj) => columns.map((col) => obj[col]).concat([formattedDate]));
 
 
-                const sql = `INSERT INTO suis.ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
+              //const sql = `INSERT INTO suis.ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}) VALUES ${placeholders}`;
+                const sql = `INSERT INTO suis.ess_3a_${activeTab.replace(/-/g, "_")} (${columnsWithDoubleQuote.join(', ')}, "Last Update") VALUES ${placeholders}`;
                 console.log('SQL:', sql);
                 console.log('values: ', values)
                 console.log('Batch Size:', batch.length);
@@ -850,6 +867,7 @@ const ARBPossessionRawDatas = (datas, possession) => {
                     // Check if all batches are completed
                     if (completedBatches === batches.length) {
                       // Perform any actions you need after all batches are done
+
                       setBatchUploadStatus(true);
                       console.log('All batches completed');
                       await getEss3ADatas().then(async () => {
@@ -940,7 +958,7 @@ const ARBPossessionRawDatas = (datas, possession) => {
 
 
 
-                      console.log("help batchUploadStatus: ", batchUploadStatus)
+                      console.log("help batchUploadStatus: ", batchUploadStatus)             
                       Swal.close(); // Close the Swal dialog
 
                     }
@@ -1090,7 +1108,7 @@ const scrollToSection = (ref) => {
     <div className={`${isMobile ? 'ml-5 mr-5' : isLaptop ? 'ml-40 mr-40' : 'ml-56 mr-56'}`}>
       <Layout>
         {/**Overall Overview of Provincial Datas CONTAINER */}
-        <div className='flex justify-center gap-9 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 items-center cursor-pointer hover:bg-grey-primary' onClick={()=> scrollToSection(tableSectionRef)}>
+        <div className='flex justify-center gap-9 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 items-center cursor-pointer hover:bg-grey-primary' onClick={()=> setShowProvincialDatass(!showProvincialDatas)}>
           {/* <Image width={180} height={170} src="/images/dar-region12-logo.png" alt='dar region 12 logo' /> */}
           <img className={`${isMobile ? 'w-[80px] h-[80px]' : 'w-[170px] h-[170px]'} sm:w-[70px] md:w-[80px] lg:w-[100px] xl:w-[120px] 2xl:w-[140px] sm:h-[70px] md:h-[80px] lg:h-[100px] xl:h-[120px] 2xl:h-[140px] `} src="/images/dar-region12-logo.png" alt='dar region 12 logo' />
           <div className='flex flex-row justify-center gap-9 md:gap-9 xl:gap-12 2xl:gap-16 items-center'>
@@ -1103,7 +1121,16 @@ const scrollToSection = (ref) => {
           {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>ESS</label>}
         </div>
         {/**Provincial Datas Overview CONTAINER */}
-        <div className={gridClassName}>
+        <Transition
+          show={showProvincialDatas}
+          enter="transition-opacity duration-150"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition-opacity duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+           <div className={gridClassName}>
           {/**NORTH COTABATO */}
           <div className={containerChildClassName} onClick={()=> {handlesTableModal('North Cotabato',"/images/cotabato.png",ess3AnorthCotData,'','3A');setActiveTab('north-cotabato');}}>
             <img className={imgClassName} src="/images/cotabato.png" alt='dar region 12 logo' />
@@ -1147,6 +1174,8 @@ const scrollToSection = (ref) => {
             {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-gray-600', countTotalARBs(ess3AsultanKudaratData))}
           </div>
         </div>
+          </Transition>
+       
         {/**Is the ARB still in possession? CONTAINER */}
         <div className='flex justify-around bg-white rounded-3xl h-fit p-8 shadow-md overflow-x-auto overflow-y-hidden mb-5 mt-5 overflow-scroll '>
           <div className='flex flex-row justify-between items-center cursor-pointer hover:bg-grey-primary rounded-full p-1 duration-200' onClick={() => handlesShowARBposDatas('yes')}>
@@ -1273,23 +1302,25 @@ const scrollToSection = (ref) => {
           </div>
         </Transition>
         {/**TABLE CONTAINER */}
-        <div className='bg-white rounded-3xl mt-10 pl-5 pr-5 shadow-md max-w-full overflow-x-auto' ref={tableSectionRef}>
+        <div className='bg-white rounded-3xl mt-5 pl-5 pr-5 shadow-md max-w-full overflow-x-auto' ref={tableSectionRef}>
           <div className={`flex justify-between ${isLaptop ? 'flex-wrap' : ''}`}>
             <div className={`flex items-center ${isLaptop ? 'flex-wrap' : ''}`}>
               <div className={`flex  ${isLaptop ? 'flex-wrap' : ''}`}>
-                <div className='flex items-center'>
+                <div className='flex items-center relative'>
                   <MdSearch className='absolute mt-4 ml-2 text-2xl' />
                   <input
                     className='rounded-3xl h-12 w-auto border-2 mt-4 pl-8 align-middle pr-3'
                     type='text'
                     placeholder='Search'
                     value={searchQuery}
-                    onChange={handlesSearchQuery} />
+                    onChange={handlesSearchQuery}
+                  />
                   <MdClose
-                    className='absolute mt-4 ml-48 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
-                    onClick={() => setSearchQuery('')} />
-
+                    className='absolute mt-4 right-5 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
+                    onClick={() => setSearchQuery('')}
+                  />
                 </div>
+
                 <div
                   className='flex items-center justify-center 
               rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary

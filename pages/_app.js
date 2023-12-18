@@ -1,3 +1,4 @@
+'use client';
 import '../styles/globals.css'
 import { MenuProvider } from './api/MenuContext'
 import { useState, useEffect } from 'react';

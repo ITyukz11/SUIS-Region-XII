@@ -63,6 +63,8 @@ export default function ThreeB() {
   const [provinceArb, setProvinceArb] = useState('')
   const [provinceImage, setProvinceImage] =useState('')
 
+  const [showProvincialDatas, setShowProvincialDatass] = useState(false)
+
   const inputRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState(''); // Initialize with the index of the default active tab NOT WORKING, I created tabIndex instead
@@ -775,20 +777,19 @@ const ARBPossessionRawDatas = (datas, possession) => {
                     'end': rowDataArray[1],
                     'today': rowDataArray[2],
                     'username': rowDataArray[3],
-                    'phonenumber': rowDataArray[5],
-                    'audit': rowDataArray[6],
-                    'audit_URL': rowDataArray[7],
-                    'Collective CLOA Sequence Number': rowDataArray[9],
-                    'OCT/TCT Number': rowDataArray[10],
-                    'Collective CLOA Number': rowDataArray[11],
-                    'First Name': rowDataArray[13],
-                    'Middle Name': rowDataArray[14],
-                    'Last Name': rowDataArray[15],
-                    'Actual area of tillage/cultivation (in square meters)': rowDataArray[17],
-                    'Is the ARB still in possession?': rowDataArray[18],
-                    'Gender': rowDataArray[23],
-                    'Educational Attainment': rowDataArray[46],
-                    'Civil Status': rowDataArray[47],
+                    'phonenumber': rowDataArray[4],
+                    'audit': rowDataArray[5],
+                    'Collective CLOA Sequence Number': rowDataArray[6],
+                    'OCT/TCT Number': rowDataArray[7],
+                    'Collective CLOA Number': rowDataArray[8],
+                    'First Name': rowDataArray[9],
+                    'Middle Name': rowDataArray[10],
+                    'Last Name': rowDataArray[11],
+                    'Actual area of tillage/cultivation (in square meters)': rowDataArray[12],
+                    'Is the ARB still in possession?': rowDataArray[13],
+                    'Gender': rowDataArray[14],
+                    'Educational Attainment': rowDataArray[15],
+                    'Civil Status': rowDataArray[16],
                   };
                   datas.push(selectedData);
                 })
@@ -1091,7 +1092,7 @@ const scrollToSection = (ref) => {
     <div className={`${isMobile ? 'ml-5 mr-5' : isLaptop ? 'ml-40 mr-40' : 'ml-56 mr-56'}`}>
       <Layout>
         {/**Overall Overview of Provincial Datas CONTAINER */}
-        <div className='flex justify-center gap-9 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 items-center cursor-pointer hover:bg-grey-primary' onClick={()=> scrollToSection(tableSectionRef)}>
+        <div className='flex justify-center gap-9 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 items-center cursor-pointer hover:bg-grey-primary' onClick={()=> setShowProvincialDatass(!showProvincialDatas)}>
           {/* <Image width={180} height={170} src="/images/dar-region12-logo.png" alt='dar region 12 logo' /> */}
           <img className={`${isMobile ? 'w-[80px] h-[80px]' : 'w-[170px] h-[170px]'} sm:w-[70px] md:w-[80px] lg:w-[100px] xl:w-[120px] 2xl:w-[140px] sm:h-[70px] md:h-[80px] lg:h-[100px] xl:h-[120px] 2xl:h-[140px] `} src="/images/dar-region12-logo.png" alt='dar region 12 logo' />
           <div className='flex flex-row justify-center gap-9 md:gap-9 xl:gap-12 2xl:gap-16 items-center'>
@@ -1104,7 +1105,16 @@ const scrollToSection = (ref) => {
           {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>ESS</label>}
         </div>
         {/**Provincial Datas Overview CONTAINER */}
-        <div className={gridClassName}>
+        <Transition
+          show={showProvincialDatas}
+          enter="transition-opacity duration-150"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition-opacity duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+               <div className={gridClassName}>
           {/**NORTH COTABATO */}
           <div className={containerChildClassName} onClick={()=> {handlesTableModal('North Cotabato',"/images/cotabato.png",ess3BnorthCotData,'','3B');setActiveTab('north-cotabato')}}>
             <img className={imgClassName} src="/images/cotabato.png" alt='dar region 12 logo' />
@@ -1145,27 +1155,31 @@ const scrollToSection = (ref) => {
             {overviewProvinceData(<MdMap />, 'Area', 'text-gray-600', countAreas(ess3BsultanKudaratData))}
             {overviewProvinceData(<MdFace6 />, 'Male', 'text-gray-600', countTotalMales(ess3BsultanKudaratData))}
             {overviewProvinceData(<MdFace3 />, 'Female', 'text-gray-600', countTotalFemales(ess3BsultanKudaratData))}
-            {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-gray-600', countTotalARBs(ess3BsultanKudaratData))}
+              {overviewProvinceData(<MdGroups2 />, 'ARBs', 'text-gray-600', countTotalARBs(ess3BsultanKudaratData))}
+            </div>
           </div>
-        </div>
+        </Transition>
+
         {/**TABLE CONTAINER */}
         <div className='bg-white rounded-3xl mt-10 pl-5 pr-5 shadow-md max-w-full overflow-x-auto' ref={tableSectionRef}>
           <div className={`flex justify-between ${isLaptop ? 'flex-wrap' : ''}`}>
             <div className={`flex items-center ${isLaptop ? 'flex-wrap' : ''}`}>
               <div className={`flex  ${isLaptop ? 'flex-wrap' : ''}`}>
-                <div className='flex items-center'>
+                <div className='flex items-center mb-2 relative'>
                   <MdSearch className='absolute mt-4 ml-2 text-2xl' />
                   <input
                     className='rounded-3xl h-12 w-auto border-2 mt-4 pl-8 align-middle pr-3'
                     type='text'
                     placeholder='Search'
                     value={searchQuery}
-                    onChange={handlesSearchQuery} />
+                    onChange={handlesSearchQuery}
+                  />
                   <MdClose
-                    className='absolute mt-4 ml-48 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
-                    onClick={() => setSearchQuery('')} />
-
+                    className='absolute mt-4 right-5 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
+                    onClick={() => setSearchQuery('')}
+                  />
                 </div>
+
                 <div
                   className='flex items-center justify-center 
               rounded-3xl h-12 w-fit pl-2 pr-2 border-2 mt-4 bg-navy-primary

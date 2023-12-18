@@ -344,6 +344,7 @@ console.log("islocalhost: ",isLocalhost)
     }
     
   }
+
   const handleUpload = () => {
     let start = 0
     let end = 0
@@ -385,22 +386,20 @@ console.log("fileName: ", fileName)
                     {  // Use the found index, or an empty string if not found
                       'start': rowDataArray[0],
                       'end': rowDataArray[1],
-                      'today': rowDataArray[2],
-                      'username': rowDataArray[3],
-                      'phonenumber': rowDataArray[4],
-                      'audit': rowDataArray[5],
-                      'audit_URL': rowDataArray[6],
-                      'Collective CLOA Sequence Number': rowDataArray[7],
-                      'OCT/TCT Number': rowDataArray[8],
-                      'Collective CLOA Number': rowDataArray[9],
-                      'First Name': rowDataArray[10],
-                      'Middle Name': rowDataArray[11],
-                      'Last Name': rowDataArray[12],
-                      'Actual area of tillage/cultivation (in square meters)': rowDataArray[13],
-                      'Is the ARB still in possession?': rowDataArray[14],
-                      'Gender': rowDataArray[15],
-                      'Educational Attainment': rowDataArray[16],
-                      'Civil Status': rowDataArray[17],
+                      'username': rowDataArray[2],
+                      'phonenumber': rowDataArray[3],
+                      'Collective CLOA Sequence Number': rowDataArray[4],
+                      'OCT/TCT Number': rowDataArray[5],
+                      'Collective CLOA Number': rowDataArray[6],
+                      'First Name': rowDataArray[7],
+                      'Middle Name': rowDataArray[8],
+                      'Last Name': rowDataArray[9],
+                      'Lot # of the actual area of tillage/cultivation (based on the Approved Subdivision Plan if available)':rowDataArray[10],
+                      'Actual area of tillage/cultivation (in square meters)': rowDataArray[11],
+                      'Is the ARB still in possession?': rowDataArray[12],
+                      'Gender': rowDataArray[13],
+                      'Educational Attainment': rowDataArray[14],
+                      'Civil Status': rowDataArray[15],
                     }: {  // Use the found index, or an empty string if not found
                       'start': rowDataArray[0],
                       'end': rowDataArray[1],
@@ -460,7 +459,7 @@ console.log("fileName: ", fileName)
               //IF test Local has no error in request POST then continue inserting datas
               
               console.log("localUploadTest: ",localUploadTest)
-              //TEMPORARY localUploadTest FOR TOMORROWS JOB
+              //TEMPORARY localUploadTest FOR TOMORROWS JOB 
               if (1===1) {
                 //before inserting go delete the current data first 
                 if(currentTab.length >= 0){
@@ -622,6 +621,13 @@ console.log("fileName: ", fileName)
       }
     }
   };
+
+  const uploadLastUpdateDate = (fileName, province) =>{
+    const date = new Date()
+    const sql = `INSERT INTO suis.ess_${fileName}_${province} (Last Update) VALUES($1)`
+    const values = `['${date}']`
+    uploadDataToLocal(sql,values)
+  }
   //Handling Upload Success
   useEffect(() => {
     console.log("uploadingSuccess:", uploadingSuccess)
@@ -829,20 +835,22 @@ console.log("fileName: ", fileName)
                       <Tab.Panel className="pr-4 pb-4 pl-4 border-2 border-gray-500q rounded-lg">
                         <div className='flex justify-between items-center'>
 
-                          <div className='flex items-center mb-2'>
+                          <div className='flex items-center mb-2 relative'>
                             <MdSearch className='absolute mt-4 ml-2 text-2xl' />
                             <input
                               className='rounded-3xl h-12 w-auto border-2 mt-4 pl-8 align-middle pr-3'
                               type='text'
                               placeholder='Search'
                               value={searchQuery}
-                              onChange={handlesSearchQuery} />
+                              onChange={handlesSearchQuery}
+                            />
                             <MdClose
-                              className='absolute mt-4 ml-48 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
-                              onClick={() => setSearchQuery('')} />
-
+                              className='absolute mt-4 right-5 text-2xl hover:bg-gray-300 hover:cursor-pointer rounded-full'
+                              onClick={() => setSearchQuery('')}
+                            />
                           </div>
-                          <label className='text-red-500 font-semibold'>*Last updated October 23, 2023</label>
+
+                          <label className='text-red-500 font-semibold'>Last Upload: {props.tableData[0] ? props.tableData[0]["Last Update"] : null}</label>
                           <div className={`flex items-center gap-5 ${isLaptop ? 'flex-wrap' : ''}`}>
                             {selectedFile && uploadingStatus && (
                               <>

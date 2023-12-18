@@ -1,4 +1,4 @@
-'use client'
+
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
@@ -6,12 +6,15 @@ import { useCallback } from "react";
 import Particles from "react-particles";
 //import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
 import { loadSlim } from "tsparticles-slim"; // if you are going to use `loadSlim`, install the "tsparticles-slim" package too.
+import UtilsQueryErrorAlert from '../components/utils/query-error-alert';
 
 export default function Login() {
   const [currentImage, setCurrentImage] = useState('/images/SUIS-Logo.png');
   const alternateImage = '/images/RPS-Logo.png';
   const [isImageFading, setIsImageFading] = useState(false);
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -26,6 +29,35 @@ export default function Login() {
     return () => clearInterval(intervalId);
   }, [currentImage, alternateImage]);
 
+  const handleLogin = async () => {
+    // try {
+    //   const query = 'SELECT username, password FROM suis.users WHERE username = $1 AND password = $2';
+    //   const values = [username, password];
+  
+    //   const response = await fetch(url, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //       sql: query,
+    //       values: values,
+    //     }),
+    //   });
+  
+    //   if (response.ok) {
+    //     const result = await response.json();
+    //     // Process the result
+    //   } else {
+    //     const errorMessage = await response.text();
+    //     console.error(`Failed to execute query. Server response: ${errorMessage}`);
+    //    
+    //   }
+    // } catch (error) {
+    //   console.error('An error occurred while executing the query:', error);
+    //   
+    // }
+  };
   
 
   const particlesInit = useCallback(async engine => {
@@ -53,44 +85,49 @@ const particlesLoaded = useCallback(async container => {
         
         <form>
           <div className="mb-4">
-            <label className="block text-sm font-semibold mb-1" htmlFor="username">
-              Username
-            </label>
-            <input
-              className="w-full py-2 px-3 rounded text-center bg-gray-800 text-white focus:outline-none focus:ring focus:border-blue-300"
-              type="text"
-              id="username"
-              name="username"
-              placeholder="Enter your username"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-semibold mb-1" htmlFor="password">
-              Password
-            </label>
-            <input
-              className="w-full py-2 px-3 rounded text-center bg-gray-800 text-white focus:outline-none focus:ring focus:border-blue-300"
-              type={showPassword? "text":"password"}
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-            />
+          <label className="block text-sm font-semibold mb-1" htmlFor="username">
+            Username
+          </label>
+          <input
+            className="w-full py-2 px-3 rounded text-center bg-gray-800 text-white focus:outline-none focus:ring focus:border-blue-300"
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1" htmlFor="password">
+            Password
+          </label>
+          <input
+            className="w-full py-2 px-3 rounded text-center bg-gray-800 text-white focus:outline-none focus:ring focus:border-blue-300"
+            type={showPassword ? 'text' : 'password'}
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
           </div>
           <div className='flex gap-2 -mt-2'>
-            <input type='checkbox' onClick={()=> setShowPassword(!showPassword)}></input>
-            <label>Show Password</label>
-          </div>
-          <div className="flex flex-col gap-5 text-center mt-4">
-            <Link href="/dashboard">       
-            <button
-              className="w-full bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 shadow-md shadow-gray-600"
-              type="button"
-            >
-              Login
-            </button>
-            </Link>
-            <span className='-mb-5'>v0.0.2</span>
-          </div>
+              <input type='checkbox' onClick={() => setShowPassword(!showPassword)}></input>
+              <label>Show Password</label>
+            </div>
+            <div className="flex flex-col gap-5 text-center mt-4">
+              <Link href="/dashboard">
+                <button
+                  className="w-full bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 shadow-md shadow-gray-600"
+                  type="button"
+                  onClick={handleLogin}
+                >
+                  Login
+                </button>
+              </Link>
+              <span className='-mb-5'>v0.0.2</span>
+            </div>
         </form>
       </div>
       </div>

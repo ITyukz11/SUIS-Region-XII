@@ -1,9 +1,8 @@
 import { Dialog, Transition } from '@headlessui/react'
-import Image from 'next/image'
 import { Fragment } from 'react'
-import { MdBrowserUpdated } from 'react-icons/md'
 
-export default function ProvinceDataModal(props) {
+export default function QueryModal(props) {
+    console.log(props.data)
     return (
         <>
             <Transition appear show={props.isOpen} as={Fragment}>
@@ -20,8 +19,8 @@ export default function ProvinceDataModal(props) {
                         <div className="fixed inset-0 bg-black bg-opacity-25" />
                     </Transition.Child>
 
-                    <div className="fixed inset-0">
-                        <div className="flex items-center justify-center p-4 text-center">
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-out duration-300"
@@ -31,26 +30,23 @@ export default function ProvinceDataModal(props) {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-screen-sm transform overflow-hidden rounded-2xl bg-white p-6 text-center align-middle shadow-xl transition-all">
+                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-center align-middle shadow-xl transition-all">
                                     <Dialog.Title
                                         as="h3"
                                         className="text-lg font-medium leading-6 text-gray-900"
                                     >
-                                        <div className='flex align-middle justify-center gap-5'>
-                                            <Image src='/images/SUIS-Logo.png' height={50} width={50} alt='SUIS-Logo'/>
-                                           <label className='mt-2'>ESS 3A CCLOA Sequence Number: <i><b><u>{props.data? props.data['Collective CLOA Sequence Number']:''}</u></b></i></label>
-                                           <Image src='/images/RPS-Logo.png' height={50} width={50} alt='RPS-Logo'/>
-                                        </div>
+
                                     </Dialog.Title>
                                     <div className='overflow-y-auto flex justify-center w-full h-[80vh]'>
-                                    <table className="border border-collapse w-full">
-                                        <thead>
+                                        <table className="border border-collapse w-full">
+                                            <thead>
                                             <tr className='border text-gray-700 uppercase bg-gray-200'>
                                                 <th className='border p-2'>Particulars</th>
                                                 <th className='border p-2'>Data</th>
                                             </tr>
-                                        </thead>
-                                        <tbody>
+
+                                            </thead>
+                                            <tbody>
                                             {props.data && typeof props.data === 'object'
                                                 ? Object.entries(props.data).map(([property, value], index) => (
                                                     property != 'Last Update'?
@@ -62,17 +58,26 @@ export default function ProvinceDataModal(props) {
                                                     
                                                 ))
                                                 : <tr><td colSpan="2" className="border p-2">No data available</td></tr>}
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
                                     </div>
-                              
-                                    <div className="mt-4">
+
+
+
+                                    <div className="flex justify-center mt-4 gap-5">
                                         <button
                                             type="button"
-                                            className="inline-flex justify-center rounded-md border border-transparent bg-navy-primary px-4 py-2 text-sm font-medium text-grey-primary hover:bg-opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                             onClick={props.isClose}
                                         >
                                             Close
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                            onClick={props.isClose}
+                                        >
+                                            Save
                                         </button>
                                     </div>
                                 </Dialog.Panel>
@@ -81,6 +86,7 @@ export default function ProvinceDataModal(props) {
                     </div>
                 </Dialog>
             </Transition>
+
         </>
     )
 }
