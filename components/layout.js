@@ -93,6 +93,7 @@ export default function Layout({ children }) {
 
     return (
         <div className="flex flex-col justify-center items-center min-h-screen ">
+            {/**HEADER */}
             <header className="bg-navy-primary text-grey-primary fixed top-0 left-0 right-0 h-14 flex items-center justify-center font-bold uppercase overflow-hidden z-10">
                 <MdMenu className="text-5xl p-2 absolute bg-transparent w-fit text-grey-primary rounded-full left-1 top-1 cursor-pointer border-grey-primary border-solid hover:border-2 " onClick={toggleDisclosure} />
 
@@ -285,10 +286,12 @@ export default function Layout({ children }) {
                                                 <MdUploadFile className=" text-grey-primary group-hover:text-white font-semibold" />
                                                 <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold">Upload CCIS File</h5>
                                             </li>
+                                            <Link href='/ccis/field-validation-team'>
                                             <li className="flex mb-2 justify-start items-center gap-2 pl-10 hover:bg-slate-500 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-300 hover:translate-x-3">
                                                 <MdLandscape className=" text-grey-primary group-hover:text-white font-semibold" />
                                                 <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold">Field Validation</h5>
                                             </li>
+                                            </Link>
                                             <li className="flex mb-2 justify-start items-center gap-2 pl-10 hover:bg-slate-500  p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto duration-300 hover:translate-x-3">
                                                 <MdDraw className=" text-grey-primary group-hover:text-white font-semibold" />
                                                 <h5 className="text-sm text-grey-primary group-hover:text-white font-semibold ">Survey</h5>
@@ -410,7 +413,9 @@ export default function Layout({ children }) {
                 <Image src='/images/RPS-Logo.png' height={50} width={50} alt="RPS Logo" />
                 <label className={`${isMobile ? 'text-xs' : 'text-2xl'} xl:text-2xl lg:text-xl md:text-lg sm:text-xs`}>© 2023 - Regional Planning Section</label>
             </footer>
+            {ccisUploadModalOpen &&  (
             <UploadCCISModal isOpen={ccisUploadModalOpen} isClose={() => setCcisUploadModalOpen(!ccisUploadModalOpen)} />
+            )}
         </div>
     );
 }
