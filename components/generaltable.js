@@ -17,21 +17,26 @@ export default function GeneralTable(props) {
 
         useEffect(() => {
           setCurrentPage(1)
-        
-    
+
+
         }, [props.tableData])
 
-            // Get the current page's tableData
-    const currentData = props.tableData? sortActive?
-    sortedData().slice(startIndex,endIndex)
-    :props.tableData.slice(startIndex, endIndex):'';
-  
-    // Function to navigate to the next page
-    const nextPage = () => {
-      if (currentPage < Math.ceil(props.tableData.length / itemsPerPage)) {
-        setCurrentPage(currentPage + 1);
-      }
-    };
+  console.log("GENERAL TABLE PROPS: ", props)
+
+  // Get the current page's tableData
+  const currentData = Array.isArray(props.tableData)
+    ? sortActive
+      ? sortedData().slice(startIndex, endIndex)
+      : props.tableData.slice(startIndex, endIndex)
+    : '';
+
+
+  // Function to navigate to the next page
+  const nextPage = () => {
+    if (currentPage < Math.ceil(props.tableData.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
     //Function to go to the last page
     const endPage = () => {
@@ -110,7 +115,7 @@ export default function GeneralTable(props) {
      <tr>
        {Object.keys(currentData[0]).map((column, index) => (
          <th className="text-sm md:text-base text-center" key={index} style={{ background: '#f2f2f2',  border: '1px solid #ddd', fontWeight: 'bold', color: '#333' }}>
-           {column.toUpperCase()}
+           {column}
          </th>
        ))}
      </tr>
