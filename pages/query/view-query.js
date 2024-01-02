@@ -93,7 +93,7 @@ const ViewTables = () => {
             {currentItems.length ? (
               currentItems.map((data, index) => (
                 <motion.div
-                  className={`flex flex-col gap-5 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-xl h-fit p-4 shadow-md mb-5 w-[300px] cursor-pointer hover:bg-grey-primary`}
+                  className={`flex flex-col gap-5 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-xl h-fit p-4 shadow-md mb-5 w-[350px] cursor-pointer hover:bg-grey-primary`}
                   key={data.query_id}
                   initial='initial'
                   animate='animate'

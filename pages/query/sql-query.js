@@ -24,6 +24,11 @@ export default function sqlquery() {
       .then(mod => setStyle(mod.default));
   }, []);
   const tables = [
+    "ccis_north_cotabato",
+    "ccis_sarangani",
+    "ccis_south_cotabato",
+    "ccis_sultan_kudarat",
+    
     "ess_3a_north_cotabato",
     "ess_3a_south_cotabato",
     "ess_3a_sarangani",
@@ -77,7 +82,6 @@ export default function sqlquery() {
       case "ess_3b_sarangani":
         url += "ess/3b/sarangani"
         break;
-
       case "ess_3b_south_cotabato":
         url += "ess/3b/south-cotabato"
         break;
@@ -85,12 +89,25 @@ export default function sqlquery() {
       case "ess_3b_sultan_kudarat":
         url += "ess/3b/sultan-kudarat"
         break;
+      //CCIS
+      case "ccis_north_cotabato":
+        url += "ccis/north-cotabato"
+        break;
+      case "ccis_sarangani":
+        url += "ccis/sarangani"
+        break;
+      case "ccis_south_cotabato":
+        url += "ccis/south-cotabato"
+        break;
+      case "ccis_sultan_kudarat":
+        url += "ccis/sultan-kudarat"
+        break;
       default:
         break;
     }
     if (query === '') UtilsQueryErrorAlert('Your script is blank.');
     else if (endPointTable) {
-      // Append the endpoint to the base URL  
+      // Append the endpoint to the base URL
       try {
         const response = await fetch(url, {
           method: 'POST',
