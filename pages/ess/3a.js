@@ -1118,7 +1118,10 @@ const scrollToSection = (ref) => {
             {overviewData(<MdFace3 />, 'Female:', localStorageEss3ATotalFemale == undefined ? totalFemale : localStorageEss3ATotalFemale)}
             {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3ATotalARB == undefined ? totalARB : localStorageEss3ATotalARB)}
           </div>
-          {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>ESS</label>}
+          <div className='flex flex-col justify-center items-center'>
+            {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>ESS</label>}
+            {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>3A</label>}
+          </div>
         </div>
         {/**Provincial Datas Overview CONTAINER */}
         <Transition

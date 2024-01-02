@@ -1092,7 +1092,7 @@ const scrollToSection = (ref) => {
     <div className={`${isMobile ? 'ml-5 mr-5' : isLaptop ? 'ml-40 mr-40' : 'ml-56 mr-56'}`}>
       <Layout>
         {/**Overall Overview of Provincial Datas CONTAINER */}
-        <div className='flex justify-center gap-9 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 items-center cursor-pointer hover:bg-grey-primary' onClick={()=> setShowProvincialDatass(!showProvincialDatas)}>
+        <div className='flex justify-center gap-9 md:gap-6 xl:gap-9 2xl:gap-16 bg-white rounded-3xl h-fit p-4 shadow-md overflow-x-auto overflow-y-hidden mb-5 items-center cursor-pointer hover:bg-grey-primary' onClick={() => setShowProvincialDatass(!showProvincialDatas)}>
           {/* <Image width={180} height={170} src="/images/dar-region12-logo.png" alt='dar region 12 logo' /> */}
           <img className={`${isMobile ? 'w-[80px] h-[80px]' : 'w-[170px] h-[170px]'} sm:w-[70px] md:w-[80px] lg:w-[100px] xl:w-[120px] 2xl:w-[140px] sm:h-[70px] md:h-[80px] lg:h-[100px] xl:h-[120px] 2xl:h-[140px] `} src="/images/dar-region12-logo.png" alt='dar region 12 logo' />
           <div className='flex flex-row justify-center gap-9 md:gap-9 xl:gap-12 2xl:gap-16 items-center'>
@@ -1102,7 +1102,10 @@ const scrollToSection = (ref) => {
             {overviewData(<MdFace3 />, 'Female:', localStorageEss3BTotalFemale == undefined ? totalFemale : localStorageEss3BTotalFemale)}
             {overviewData(<MdGroups2 />, 'ARBs:', localStorageEss3BTotalARB == undefined ? totalARB : localStorageEss3BTotalARB)}
           </div>
-          {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>ESS</label>}
+          <div className='flex flex-col justify-center items-center'>
+            {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>ESS</label>}
+            {isMobile ? '' : <label className='font-black flex items-center text-4xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl cursor-pointer'>3B</label>}
+          </div>
         </div>
         {/**Provincial Datas Overview CONTAINER */}
         <Transition
