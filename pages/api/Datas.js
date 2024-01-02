@@ -16,6 +16,17 @@ export function DatasProvider({ children }) {
     //DYNAMIC QUERIES
     const [dynamicQueryResultsData, setDynamicQueryResultsData] = useState([])
 
+    //CCIS DATAS
+    const [CCISNorthCotData, setCCISNorthCotData] =useState([])
+    const [CCISSaranganiData, setCCISSaranganiData] =useState([])
+    const [CCISSouthCotData, setCCISSouthCotData] =useState([])
+    const [CCISSultanKudaratData, setCCISSultanKudaratData] =useState([])
+    const [CCISAnnotatedARBsData, setCCISAnnotatedARBsData] = useState([])
+
+    const [localStorageCCISTotalNoOfCCLOA, setLocalStorageCCISTotalNoOfCCLOA] = useState()
+    const [localStorageCCISTotalArea, setLocalStorageCCISTotalArea] = useState()
+    const [localStorageCCISAnnotatedTotalNoOfArbs, setLocalStorageCCISAnnotatedTotalNoOfArbs] = useState()
+
     //ESS 3A
     const [ess3AnorthCotData, setEss3ANorthCotData] = useState([]);
     const [ess3AsaranganiData, setEss3ASaranganiData] = useState([]);
@@ -228,6 +239,74 @@ export function DatasProvider({ children }) {
     });
   }
 
+  async function getCCISDatas(){
+    const postData = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+  
+    provinces.forEach(async (province) => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ccis/${province}`, postData);
+        const response = await res.json();
+        if (!response.error) {
+          switch (province) {
+            case 'north-cotabato':
+              setCCISNorthCotData(response);
+              break;
+            case 'sarangani':
+              setCCISSaranganiData(response);
+              break;
+            case 'south-cotabato':
+              setCCISSouthCotData(response);
+              break;
+            case 'sultan-kudarat':
+              setCCISSultanKudaratData(response);
+              break;           
+            default:
+              break;
+          }
+          //console.log(`response for ${process.env.NEXT_PUBLIC_URL}/api/ccis/${province}: `, response);
+        } else {
+          // Handle the case when the response contains an error
+          //console.log(`Failed to fetch data for ${process.env.NEXT_PUBLIC_URL}/api/ccis/${province}`);
+          // You can set the data to an empty array or handle it as needed
+        }
+      } catch (error) {
+        // Handle the fetch error here
+        //console.error(`Error fetching data for ${province} URL: ${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}, postData `, error);
+        // Set the data to an empty array or handle it as needed
+      }
+    });
+  }
+
+  async function getCCISAnnotatedDatas(){
+    const postData = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+  
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ccis/annotated-arbs`, postData);
+        const response = await res.json();
+        if (!response.error) {
+          setCCISAnnotatedARBsData(response)
+          //console.log(`response for ${process.env.NEXT_PUBLIC_URL}/api/ccis/${province}: `, response);
+        } else {
+          // Handle the case when the response contains an error
+          //console.log(`Failed to fetch data for ${process.env.NEXT_PUBLIC_URL}/api/ccis/${province}`);
+          // You can set the data to an empty array or handle it as needed
+        }
+      } catch (error) {
+        // Handle the fetch error here
+        //console.error(`Error fetching data for ${province} URL: ${process.env.NEXT_PUBLIC_URL}/api/ess/3a/${province}, postData `, error);
+        // Set the data to an empty array or handle it as needed
+      }
+  }
   async function getSqlQueryScripts(){
     const postData = {
       method: "GET",
@@ -324,6 +403,8 @@ provinces.forEach(async (province) => {
             getEss3BDatas()
             getSqlScriptsDatas()
             getSqlDynamicQueryResultsDatas()
+            getCCISDatas()
+            getCCISAnnotatedDatas()
         } else {
             // getEss3ADatasTest2()
             // getEss3BDatasTest2()
@@ -331,6 +412,10 @@ provinces.forEach(async (province) => {
     }, []);
 
   useEffect(() => {
+
+    setLocalStorageCCISTotalNoOfCCLOA(localStorage.getItem('ccisTotalNoCCLOA'))
+    setLocalStorageCCISTotalArea(localStorage.getItem('ccisTotalArea'))
+    setLocalStorageCCISAnnotatedTotalNoOfArbs(localStorage.getItem('ccisAnnotatedTotalNoOfArbs'))
     //3a
     setLocalStorageEss3ATotalSeqNo(localStorage.getItem('ess3aTotalSeqNo'))
     setLocalStorageEss3ATotalArea(localStorage.getItem('ess3aTotalArea'))
@@ -357,11 +442,13 @@ provinces.forEach(async (province) => {
     return (
         <Datas.Provider
             value={{
-              getSqlScriptsDatas,
-                sqlQueryScripts,
                 isLocalhost,
                 isMobile,
                 isLaptop,
+
+                getSqlScriptsDatas,
+                sqlQueryScripts,
+                
                 localStorageEss3ATotalSeqNo,
                 localStorageEss3ATotalArea,
                 localStorageEss3ATotalMale,
@@ -387,6 +474,20 @@ provinces.forEach(async (province) => {
 
                 getSqlDynamicQueryResultsDatas,
                 dynamicQueryResultsData,
+
+                getCCISDatas,
+                CCISNorthCotData,
+                CCISSaranganiData,
+                CCISSouthCotData,
+                CCISSultanKudaratData,
+
+                getCCISAnnotatedDatas,
+                CCISAnnotatedARBsData,
+
+                localStorageCCISAnnotatedTotalNoOfArbs,
+
+                localStorageCCISTotalNoOfCCLOA,
+                localStorageCCISTotalArea,
 
                 getEss3ADatas,
                 ess3AnorthCotData,
